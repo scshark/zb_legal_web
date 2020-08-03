@@ -21,13 +21,13 @@ const showLoading = () => {
 }
 
 const closeLoading = () => {
-    acitveAxios--
-    if (acitveAxios <= 0) {
-        clearTimeout(timer)
-        loadingInstance && loadingInstance.close()
+        acitveAxios--
+        if (acitveAxios <= 0) {
+            clearTimeout(timer)
+            loadingInstance && loadingInstance.close()
+        }
     }
-}
-//http request 拦截器
+    //http request 拦截器
 service.interceptors.request.use(
     config => {
         showLoading()
@@ -37,7 +37,7 @@ service.interceptors.request.use(
         config.headers = {
             'Content-Type': 'application/json',
             'x-token': token,
-            'x-user-id':user.ID
+            'x-user-id': user.ID
         }
         return config;
     },
