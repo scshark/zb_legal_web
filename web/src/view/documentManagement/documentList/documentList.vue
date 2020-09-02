@@ -30,33 +30,33 @@
       tooltip-effect="dark"
     >
     <el-table-column type="selection" width="55"></el-table-column>
-    <el-table-column label="日期" width="180">
+    <!-- <el-table-column label="日期" width="180">
          <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
-    </el-table-column>
+    </el-table-column> -->
     
-    <el-table-column label="标题" prop="title" width="120"></el-table-column> 
+    <el-table-column label="标题" prop="title" width="350"></el-table-column> 
     
-    <el-table-column label="内容" prop="content" width="120"></el-table-column> 
+    <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
     
-    <el-table-column label="word文档下载地址" prop="wordFileUrl" width="120"></el-table-column> 
+    <el-table-column label="word文档下载地址" prop="wordFileUrl" width="300"></el-table-column> 
     
-    <el-table-column label="pdf文档下载地址" prop="pdfFileUrl" width="120"></el-table-column> 
+    <el-table-column label="pdf文档下载地址" prop="pdfFileUrl" width="300"></el-table-column> 
     
-    <el-table-column label="浏览量" prop="browseNum" width="120"></el-table-column> 
+    <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
     
-    <el-table-column label="下载量" prop="downloadNum" width="120"></el-table-column> 
+    <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
     
-    <el-table-column label="虚拟浏览量" prop="browseVirtualNum" width="120"></el-table-column> 
+    <el-table-column label="虚拟浏览量" prop="browseVirtualNum" width="100"></el-table-column> 
     
-    <el-table-column label="虚拟下载量" prop="downloadVirtualNum" width="120"></el-table-column> 
+    <el-table-column label="虚拟下载量" prop="downloadVirtualNum" width="100"></el-table-column> 
     
-    <el-table-column label="收藏数量" prop="collectionNum" width="120"></el-table-column> 
+    <el-table-column label="收藏数量" prop="collectionNum" width="90"></el-table-column> 
     
-    <el-table-column label="分享数量" prop="shareNum" width="120"></el-table-column> 
+    <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column> 
     
-    <el-table-column label="发布日期" prop="releasedAt" width="120"></el-table-column> 
+    <el-table-column label="发布日期" prop="releasedAt" width="250"></el-table-column> 
     
-    <el-table-column label="最后修改日期" prop="revisedAt" width="120"></el-table-column> 
+    <el-table-column label="最后修改日期" prop="revisedAt" width="250"></el-table-column> 
     
       <el-table-column label="按钮组">
         <template slot-scope="scope">
@@ -84,8 +84,91 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
 
-    <el-dialog :before-close="closeDialog" :visible.sync="dialogFormVisible" title="弹窗操作">
-      此处请使用表单生成器生成form填充 表单默认绑定 formData 如手动修改过请自行修改key
+    <el-dialog :before-close="closeDialog" :title="dialogTitle" :visible.sync="dialogFormVisible">
+      
+      <el-form
+        :inline="true"
+        :model="formData"
+        :rules="rules"
+        label-position="top"
+        label-width="85px"
+        ref="listForm"
+      >
+        <el-form-item label="标题" prop="title" style="width:90%">
+          <el-input autocomplete="off" v-model="formData.title"></el-input>
+        </el-form-item>
+
+        <el-form-item label="分类" prop="class" style="width:90%">
+          <el-cascader
+            :options="options"
+            :props="props"
+            clearable>
+          </el-cascader>
+        </el-form-item>
+
+        <el-form-item label="word下载地址" prop="wordFileUrl" style="width:90%">
+          <el-upload
+            class="upload-demo"
+            :action="`http://zbc.scshark.com/fileUploadAndDownload/upload`"
+            :on-change="handleChange"
+            :on-success="handleAvatarSuccess"
+            :headers="{ 'x-token': token }"
+            :multiple="false"
+            :show-file-list="false">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+          <el-input autocomplete="off" v-model="formData.wordFileUrl"></el-input>
+        </el-form-item>
+
+        <el-form-item label="pdf下载地址" prop="pdfFileUrl" style="width:90%">
+          <el-input autocomplete="off" v-model="formData.pdfFileUrl"></el-input>
+        </el-form-item>
+
+        <el-form-item label="浏览量" prop="browseNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.browseNum"></el-input>
+        </el-form-item>
+
+        <el-form-item label="下载量" prop="downloadNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.downloadNum"></el-input>
+        </el-form-item>
+
+        <el-form-item label="虚拟浏览量" prop="browseVirtualNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.browseVirtualNum"></el-input>
+        </el-form-item>
+
+        <el-form-item label="虚拟下载量" prop="downloadVirtualNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.downloadVirtualNum"></el-input>
+        </el-form-item>
+        
+        <el-form-item label="收藏数量" prop="collectionNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.collectionNum"></el-input>
+        </el-form-item>
+
+        <el-form-item label="分享数量" prop="shareNum" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.shareNum"></el-input>
+        </el-form-item>
+
+        <el-form-item label="发布日期" prop="releasedAt" style="width:45%">
+          <el-date-picker
+            v-model="formData.releasedAt"
+            autocomplete="off"
+            default-value
+            type="datetime"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </el-form-item>
+
+        <el-form-item label="最后修改日期" prop="revisedAt" style="width:45%">
+          <el-date-picker
+            v-model="formData.revisedAt"
+            autocomplete="off"
+            default-value
+            type="datetime"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+
       <div class="dialog-footer" slot="footer">
         <el-button @click="closeDialog">取 消</el-button>
         <el-button @click="enterDialog" type="primary">确 定</el-button>
@@ -105,6 +188,7 @@ import {
 } from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
 import infoList from "@/components/mixins/infoList";
+import { mapGetters } from "vuex";
 
 export default {
   name: "documentList",
@@ -116,10 +200,61 @@ export default {
       visible: false,
       type: "",
       deleteVisible: false,
-      multipleSelection: [],formData: {
-        title:null,content:null,wordFileUrl:null,pdfFileUrl:null,browseNum:null,downloadNum:null,browseVirtualNum:null,downloadVirtualNum:null,collectionNum:null,shareNum:null,releasedAt:null,revisedAt:null,
-      }
-    };
+      multipleSelection: [],
+      dialogTitle: '新增文书',
+      fileList: [],
+      props: { multiple: true },
+      options: [
+        {
+          value: 1,
+          label: '东南',
+          children: [{
+            value: 2,
+            label: '上海',
+            children: [
+              { value: 3, label: '普陀' },
+              { value: 4, label: '黄埔' },
+              { value: 5, label: '徐汇' }
+            ]
+          }]
+        }, {
+          value: 7,
+          label: '江苏',
+          children: [
+            { value: 8, label: '南京' },
+            { value: 9, label: '苏州' },
+            { value: 10, label: '无锡' }
+          ]
+        },
+      ],
+      formData: {
+        classId: [],
+        title:'',
+        wordFileUrl: '',
+        pdfFileUrl: '',
+        browseNum: 0,
+        downloadNum: 0,
+        browseVirtualNum: 0,
+        downloadVirtualNum: 0,
+        collectionNum: 0,
+        shareNum: 0,
+        releasedAt: '',
+        revisedAt: '',
+      },
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
+        pdfFileUrl: [{ required: true, message: '请输入pdf文档下载地址', trigger: 'blur' }],
+        browseNum: [{ required: true, message: '请输入浏览量', trigger: 'blur' }],
+        downloadNum: [{ required: true, message: '请输入下载量', trigger: 'blur' }],
+        browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
+        downloadVirtualNum: [{ required: true, message: '请输入虚拟下载量', trigger: 'blur' }],
+        collectionNum: [{ required: true, message: '请输入收藏数量', trigger: 'blur' }],
+        shareNum: [{ required: true, message: '请输入分享数量', trigger: 'blur' }],
+        releasedAt: [{ required: true, message: '请选择发布日期', trigger: 'blur' }],
+        revisedAt: [{ required: true, message: '请选择最后修改日期', trigger: 'blur' }],
+      },
+    }
   },
   filters: {
     formatDate: function(time) {
@@ -138,7 +273,35 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters("user", ["token"])
+  },
   methods: {
+      handleAvatarSuccess(res, file) {
+        this.formData.wordFileUrl = res.data.file.url
+      },
+      handleChange(file, fileList) {
+
+      },
+      // 初始化弹窗内表格方法
+      initForm() {
+        this.checkFlag = false
+        this.$refs.listForm.resetFields()
+        this.formData = {
+          classId: [],
+          title:'',
+          wordFileUrl: '',
+          pdfFileUrl: '',
+          browseNum: 0,
+          downloadNum: 0,
+          browseVirtualNum: 0,
+          downloadVirtualNum: 0,
+          collectionNum: 0,
+          shareNum: 0,
+          releasedAt: '',
+          revisedAt: '',
+        }
+      },
       //条件搜索前端看此方法
       onSubmit() {
         this.page = 1
@@ -165,8 +328,10 @@ export default {
         }
       },
     async updateDocument(row) {
+      this.dialogTitle = '编辑文书'
       const res = await findDocument({ ID: row.ID });
       this.type = "update";
+
       if (res.code == 0) {
         this.formData = res.data.redoc;
         this.dialogFormVisible = true;
@@ -174,21 +339,7 @@ export default {
     },
     closeDialog() {
       this.dialogFormVisible = false;
-      this.formData = {
-        
-          title:null,
-          content:null,
-          wordFileUrl:null,
-          pdfFileUrl:null,
-          browseNum:null,
-          downloadNum:null,
-          browseVirtualNum:null,
-          downloadVirtualNum:null,
-          collectionNum:null,
-          shareNum:null,
-          releasedAt:null,
-          revisedAt:null,
-      };
+      this.initForm()
     },
     async deleteDocument(row) {
       this.visible = false;
@@ -202,26 +353,30 @@ export default {
       }
     },
     async enterDialog() {
-      let res;
-      switch (this.type) {
-        case "create":
-          res = await createDocument(this.formData);
-          break;
-        case "update":
-          res = await updateDocument(this.formData);
-          break;
-        default:
-          res = await createDocument(this.formData);
-          break;
-      }
-      if (res.code == 0) {
-        this.$message({
-          type:"success",
-          message:"创建/更改成功"
-        })
-        this.closeDialog();
-        this.getTableData();
-      }
+      this.$refs.listForm.validate(async valid => {
+        if (valid) {
+          let res;
+          switch (this.type) {
+            case "create":
+              res = await createDocument(this.formData);
+              break;
+            case "update":
+              res = await updateDocument(this.formData);
+              break;
+            default:
+              res = await createDocument(this.formData);
+              break;
+          }
+          if (res.code == 0) {
+            this.$message({
+              type:"success",
+              message:"创建/更改成功"
+            })
+            this.closeDialog();
+            this.getTableData();
+          }  
+        }
+      })
     },
     openDialog() {
       this.type = "create";

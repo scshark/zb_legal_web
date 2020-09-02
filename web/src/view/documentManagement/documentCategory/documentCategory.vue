@@ -298,7 +298,7 @@ export default {
       this.dialogTitle = '编辑菜单'
       const res = await findDocumentCategory({ id })
       this.formData = res.data.docCategory
-      this.isEdit = true
+      this.isEdit = false
       this.setOptions()
       this.type = "update";
       this.dialogFormVisible = true
