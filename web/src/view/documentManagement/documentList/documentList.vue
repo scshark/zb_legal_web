@@ -37,6 +37,18 @@
     <el-table-column label="标题" prop="title" width="350"></el-table-column> 
     
     <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
+
+    <el-table-column label="分类" prop="categoriesName" width="300">
+      <template slot-scope="scope">
+        <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.categoriesName">{{ role }}</el-tag>
+      </template>
+    </el-table-column>
+
+    <el-table-column label="关键词" prop="keywords" width="300">
+      <template slot-scope="scope">
+        <el-tag type="success" class="el-tag--light" :key="role" v-for="role in scope.row.keywords">{{ role }}</el-tag>
+      </template>
+    </el-table-column>
     
     <el-table-column label="word文档下载地址" prop="wordFileUrl" width="300"></el-table-column> 
     
@@ -98,10 +110,16 @@
           <el-input autocomplete="off" v-model="formData.title"></el-input>
         </el-form-item>
 
+        <el-form-item label="关键词" prop="keywords" style="width:90%">
+          <el-input autocomplete="off" v-model="formData.keywords"></el-input>
+        </el-form-item>
+
         <el-form-item label="分类" prop="class" style="width:90%">
           <el-cascader
             :options="options"
             :props="props"
+            @change="classChange"
+            v-model="formData.classId"
             clearable>
           </el-cascader>
         </el-form-item>
@@ -110,7 +128,6 @@
           <el-upload
             class="upload-demo"
             :action="`http://zbc.scshark.com/fileUploadAndDownload/upload`"
-            :on-change="handleChange"
             :on-success="handleAvatarSuccess"
             :headers="{ 'x-token': token }"
             :multiple="false"
@@ -184,6 +201,7 @@ import {
     deleteDocumentByIds,
     updateDocument,
     findDocument,
+    findDocumentClass,
     getDocumentList
 } from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
@@ -230,6 +248,7 @@ export default {
       formData: {
         classId: [],
         title:'',
+        keywords: '',
         wordFileUrl: '',
         pdfFileUrl: '',
         browseNum: 0,
@@ -240,9 +259,11 @@ export default {
         shareNum: 0,
         releasedAt: '',
         revisedAt: '',
+        categoriesName: '',
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        keywords: [{ required: true, message: '请输关键词', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
         pdfFileUrl: [{ required: true, message: '请输入pdf文档下载地址', trigger: 'blur' }],
         browseNum: [{ required: true, message: '请输入浏览量', trigger: 'blur' }],
@@ -280,8 +301,17 @@ export default {
       handleAvatarSuccess(res, file) {
         this.formData.wordFileUrl = res.data.file.url
       },
-      handleChange(file, fileList) {
-
+      classChange(e) {
+        let classArr = []
+        for(var i=0;i<e.length;i++) {
+          for(var a=0;a<e[i].length;a++) {
+            if(a==e[i].length-1) {
+              classArr.push(e[i][e[i].length-1])
+              // console.log(e[i][e[i].length-1])
+            }
+          }
+        }
+        this.formData.classId = classArr
       },
       // 初始化弹窗内表格方法
       initForm() {
@@ -290,6 +320,7 @@ export default {
         this.formData = {
           classId: [],
           title:'',
+          keywords: '',
           wordFileUrl: '',
           pdfFileUrl: '',
           browseNum: 0,
@@ -300,6 +331,7 @@ export default {
           shareNum: 0,
           releasedAt: '',
           revisedAt: '',
+          categoriesName: '',
         }
       },
       //条件搜索前端看此方法
@@ -329,11 +361,18 @@ export default {
       },
     async updateDocument(row) {
       this.dialogTitle = '编辑文书'
-      const res = await findDocument({ ID: row.ID });
+      this.options = []
+      const res = await findDocument({ id: row.id });
+      const resClass = await findDocumentClass({ id: row.id });
       this.type = "update";
 
       if (res.code == 0) {
-        this.formData = res.data.redoc;
+        this.formData = res.data.doc;
+      }
+
+      if(resClass.code == 0) {
+        this.options = resClass.data
+        this.formData.classId = []
         this.dialogFormVisible = true;
       }
     },
@@ -361,6 +400,8 @@ export default {
               res = await createDocument(this.formData);
               break;
             case "update":
+              console.log("====== formData ======")
+              console.log(this.formData)
               res = await updateDocument(this.formData);
               break;
             default:
@@ -389,4 +430,7 @@ export default {
 </script>
 
 <style>
+.el-tag--light {
+  margin-left: 10px;
+}
 </style>
