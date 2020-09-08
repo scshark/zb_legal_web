@@ -302,6 +302,8 @@ export default {
         this.formData.wordFileUrl = res.data.file.url
       },
       classChange(e) {
+        console.log("====== e ======")
+        console.log(e)
         let classArr = []
         for(var i=0;i<e.length;i++) {
           for(var a=0;a<e[i].length;a++) {
@@ -365,16 +367,18 @@ export default {
       const res = await findDocument({ id: row.id });
       const resClass = await findDocumentClass({ id: row.id });
       this.type = "update";
+      
+      if(resClass.code == 0) {
+        this.options = resClass.data
+        this.dialogFormVisible = true;
+      }
 
       if (res.code == 0) {
         this.formData = res.data.doc;
+        // this.dialogFormVisible = true;
       }
 
-      if(resClass.code == 0) {
-        this.options = resClass.data
-        this.formData.classId = []
-        this.dialogFormVisible = true;
-      }
+      
     },
     closeDialog() {
       this.dialogFormVisible = false;
@@ -400,8 +404,6 @@ export default {
               res = await createDocument(this.formData);
               break;
             case "update":
-              console.log("====== formData ======")
-              console.log(this.formData)
               res = await updateDocument(this.formData);
               break;
             default:

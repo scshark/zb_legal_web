@@ -30,9 +30,9 @@
       tooltip-effect="dark"
     >
     <el-table-column type="selection" width="55"></el-table-column>
-    <el-table-column label="日期" width="180">
+    <!-- <el-table-column label="日期" width="180">
          <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
-    </el-table-column>
+    </el-table-column> -->
     
     <el-table-column label="用户UUID" prop="uuid" width="120"></el-table-column> 
     
@@ -83,7 +83,48 @@
     ></el-pagination>
 
     <el-dialog :before-close="closeDialog" :visible.sync="dialogFormVisible" title="弹窗操作">
-      此处请使用表单生成器生成form填充 表单默认绑定 formData 如手动修改过请自行修改key
+      <el-form ref="elForm" :model="formData" :rules="rules" size="medium" label-width="100px">
+        <el-form-item label="用户昵称" prop="nickName">
+          <el-input v-model="formData.field101" placeholder="请输入用户昵称" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="formData.field103" placeholder="请输入密码" clearable show-password
+            :style="{width: '100%'}"></el-input>
+        </el-form-item>
+        <el-form-item label="上传头像" prop="headerImg" required>
+          <el-upload ref="field104" :file-list="field104fileList" :action="field104Action"
+            :before-upload="field104BeforeUpload">
+            <el-button size="small" type="primary" icon="el-icon-upload">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="手机号码" prop="mobile">
+          <el-input v-model="formData.mobile" placeholder="请输入手机号码" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="注册日期" prop="registered_at">
+          <el-date-picker v-model="formData.registered_at" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+            :style="{width: '100%'}" placeholder="请选择日期选择" clearable></el-date-picker>
+        </el-form-item>
+        <el-form-item label="所在城市" prop="field111">
+          <el-cascader v-model="formData.field111" :options="field111Options" :props="field111Props"
+            :style="{width: '100%'}" placeholder="请选择所在城市" clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="浏览次数" prop="browseNum">
+          <el-input v-model="formData.browseNum" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="下载次数" prop="downloadNum">
+          <el-input v-model="formData.downloadNum" clearable :style="{width: '100%'}">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="用户状态" prop="status">
+          <el-select v-model="formData.status" placeholder="请选择用户状态" clearable :style="{width: '100%'}">
+            <el-option v-for="(item, index) in userStatus" :key="index" :label="item.label"
+              :value="item.value" :disabled="item.disabled"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
       <div class="dialog-footer" slot="footer">
         <el-button @click="closeDialog">取 消</el-button>
         <el-button @click="enterDialog" type="primary">确 定</el-button>
@@ -114,9 +155,24 @@ export default {
       visible: false,
       type: "",
       deleteVisible: false,
-      multipleSelection: [],formData: {
-        uuid:null,nickName:null,headerImg:null,mobile:null,registered_at:null,province:null,city:null,district:null,browseNum:null,downloadNum:null,status:null,
-      }
+      multipleSelection: [],
+      formData: {
+        uuid:null,
+        nickName:null,
+        headerImg:null,
+        mobile:null,
+        registered_at:null,
+        province:null,
+        city:null,
+        district:null,
+        browseNum:null,
+        downloadNum:null,
+        status:null,
+      },
+      userStatus: [
+        {value: 1, label: '正常'},
+         {value: 2, label: '黑名单'},
+      ]
     };
   },
   filters: {
