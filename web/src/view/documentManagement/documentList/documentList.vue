@@ -111,14 +111,21 @@
         </el-form-item>
 
         <el-form-item label="关键词" prop="keywords" style="width:90%">
-          <el-input autocomplete="off" v-model="formData.keywords"></el-input>
+          <div v-for="(item,index) in keywordsArr" :key="index" class="spanbox">
+            <span>{{item}}</span>
+            <i class="spanclose" @click="removeitem(index,item)"></i>
+          </div>
+
+          <input type="hidden" v-model="formData.docKeyword">
+
+          <el-input autocomplete="off" @keyup.enter.native="addlabel" v-model="keywords"></el-input>
         </el-form-item>
 
         <el-form-item label="分类" prop="class" style="width:90%">
           <el-cascader
             :options="options"
             :props="props"
-            @change="classChange"
+            :key="isResouceShow"
             v-model="formData.classId"
             clearable>
           </el-cascader>
@@ -222,6 +229,7 @@ export default {
       dialogTitle: '新增文书',
       fileList: [],
       props: { multiple: true },
+      isResouceShow: 0,
       options: [
         {
           value: 1,
@@ -248,7 +256,7 @@ export default {
       formData: {
         classId: [],
         title:'',
-        keywords: '',
+        docKeyword: [],
         wordFileUrl: '',
         pdfFileUrl: '',
         browseNum: 0,
@@ -263,7 +271,7 @@ export default {
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        keywords: [{ required: true, message: '请输关键词', trigger: 'blur' }],
+        docKeyword: [{ required: true, message: '请输关键词后回车', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
         pdfFileUrl: [{ required: true, message: '请输入pdf文档下载地址', trigger: 'blur' }],
         browseNum: [{ required: true, message: '请输入浏览量', trigger: 'blur' }],
@@ -275,6 +283,8 @@ export default {
         releasedAt: [{ required: true, message: '请选择发布日期', trigger: 'blur' }],
         revisedAt: [{ required: true, message: '请选择最后修改日期', trigger: 'blur' }],
       },
+      keywords: '',
+      keywordsArr: [],
     }
   },
   filters: {
@@ -298,12 +308,28 @@ export default {
     ...mapGetters("user", ["token"])
   },
   methods: {
+      // 移除标签
+      removeitem(index, item) {
+        this.keywordsArr.splice(index, 1)
+      },
+      // input回车加入labelarr中
+      addlabel(e) {
+        let count = this.keywordsArr.indexOf(this.keywords)
+        if (count === -1) {
+          this.keywordsArr.push(this.keywords)
+        } else {
+          this.$message({
+            message: '“' + this.keywords + '” 已存在',
+            type: 'warning'
+          });
+        }
+        this.keywords = ''
+      },
       handleAvatarSuccess(res, file) {
         this.formData.wordFileUrl = res.data.file.url
       },
       classChange(e) {
-        console.log("====== e ======")
-        console.log(e)
+        //暂时废用
         let classArr = []
         for(var i=0;i<e.length;i++) {
           for(var a=0;a<e[i].length;a++) {
@@ -322,7 +348,7 @@ export default {
         this.formData = {
           classId: [],
           title:'',
-          keywords: '',
+          docKeyword: [],
           wordFileUrl: '',
           pdfFileUrl: '',
           browseNum: 0,
@@ -364,6 +390,7 @@ export default {
     async updateDocument(row) {
       this.dialogTitle = '编辑文书'
       this.options = []
+      ++this.isResouceShow
       const res = await findDocument({ id: row.id });
       const resClass = await findDocumentClass({ id: row.id });
       this.type = "update";
@@ -375,10 +402,12 @@ export default {
 
       if (res.code == 0) {
         this.formData = res.data.doc;
+        if(res.data.doc.docKeyword) {
+          this.keywordsArr = res.data.doc.docKeyword
+        }
+        
         // this.dialogFormVisible = true;
-      }
-
-      
+      } 
     },
     closeDialog() {
       this.dialogFormVisible = false;
@@ -396,6 +425,7 @@ export default {
       }
     },
     async enterDialog() {
+      this.formData.docKeyword = this.keywordsArr
       this.$refs.listForm.validate(async valid => {
         if (valid) {
           let res;
@@ -404,6 +434,15 @@ export default {
               res = await createDocument(this.formData);
               break;
             case "update":
+              let classArr = []
+              for(var i=0;i<this.formData.classId.length;i++) {
+                for(var a=0;a<this.formData.classId[i].length;a++) {
+                  if(a==this.formData.classId[i].length-1) {
+                    classArr.push(this.formData.classId[i][this.formData.classId[i].length-1])
+                  }
+                }
+              }
+              this.formData.classId = classArr
               res = await updateDocument(this.formData);
               break;
             default:
@@ -433,6 +472,58 @@ export default {
 
 <style>
 .el-tag--light {
-  margin-left: 10px;
+  margin: 10px 5px;
+}
+.spanbox {
+  line-height: 30px;
+  margin: 2px;
+  padding: 0 10px;
+  background-color: #1abc9c;
+  color: white;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  overflow: hidden;
+  transition: 0.25s linear;
+}
+
+.spanbox:hover {
+  padding: 0px 17px 0 3px;
+}
+
+.spanclose {
+  color: white;
+  padding: 0 10px 0 0;
+  cursor: pointer;
+  font-size: 12px;
+  position: absolute;
+  right: -3px;
+  text-align: right;
+  text-decoration: none;
+  top: 0;
+  width: 100%;
+  bottom: 0;
+  z-index: 2;
+  opacity: 0;
+  filter: "alpha(opacity=0)";
+  transition: opacity 0.25s linear;
+  font-style: normal;
+}
+
+.spanbox:hover .spanclose {
+  padding: 0 10px 5px 0;
+  opacity: 1;
+  -webkit-filter: none;
+  filter: none;
+}
+
+.spanclose:after {
+  content: "x";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 27px;
 }
 </style>
