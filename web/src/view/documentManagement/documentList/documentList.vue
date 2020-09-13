@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">                        
+      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">     
+        <el-form-item label="关键词">
+          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        </el-form-item>                 
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
@@ -46,7 +49,7 @@
 
     <el-table-column label="关键词" prop="keywords" width="300">
       <template slot-scope="scope">
-        <el-tag type="success" class="el-tag--light" :key="role" v-for="role in scope.row.keywords">{{ role }}</el-tag>
+        <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
       </template>
     </el-table-column>
     
@@ -110,7 +113,7 @@
           <el-input autocomplete="off" v-model="formData.title"></el-input>
         </el-form-item>
 
-        <el-form-item label="关键词" prop="keywords" style="width:90%">
+        <el-form-item label="关键词" prop="docKeyword" style="width:90%">
           <div v-for="(item,index) in keywordsArr" :key="index" class="spanbox">
             <span>{{item}}</span>
             <i class="spanclose" @click="removeitem(index,item)"></i>
@@ -121,7 +124,7 @@
           <el-input autocomplete="off" @keyup.enter.native="addlabel" v-model="keywords"></el-input>
         </el-form-item>
 
-        <el-form-item label="分类" prop="class" style="width:90%">
+        <el-form-item label="分类" prop="classId" style="width:90%">
           <el-cascader
             :options="options"
             :props="props"
@@ -209,6 +212,7 @@ import {
     updateDocument,
     findDocument,
     findDocumentClass,
+    getAllCategory,
     getDocumentList
 } from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
@@ -271,6 +275,7 @@ export default {
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        classId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
         docKeyword: [{ required: true, message: '请输关键词后回车', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
         pdfFileUrl: [{ required: true, message: '请输入pdf文档下载地址', trigger: 'blur' }],
@@ -460,8 +465,13 @@ export default {
         }
       })
     },
-    openDialog() {
+    async openDialog() {
+      const categoryData = await getAllCategory();
+      if(categoryData.code == 0) {
+        this.options = categoryData.data
+      }
       this.type = "create";
+
       this.dialogFormVisible = true;
     }
   },

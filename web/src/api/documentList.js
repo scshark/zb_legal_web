@@ -99,6 +99,21 @@ export const findDocumentClass = (params) => {
     })
 }
 
+// @Tags Document
+// @Summary 查询所有的分类分类
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body model.Document true "查询所有的分类分类"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
+// @Router /doc/findDocument [get]
+export const getAllCategory = (params) => {
+    return service({
+        url: "/docCategory/getAllCategory",
+        method: 'get',
+    })
+}
+
 
 // @Tags Document
 // @Summary 分页获取Document列表

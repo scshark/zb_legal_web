@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">          
+      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">   
+        <el-form-item label="关键词">
+          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        </el-form-item>       
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
@@ -30,9 +33,9 @@
       tooltip-effect="dark"
     >
     <el-table-column type="selection" width="55"></el-table-column>
-    <el-table-column label="日期" width="180">
+    <!-- <el-table-column label="日期" width="180">
          <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
-    </el-table-column>
+    </el-table-column> -->
     
     <el-table-column label="名称" prop="name" width="120"></el-table-column> 
     
@@ -40,7 +43,12 @@
     
     <el-table-column label="文书数量" prop="documentNum" width="120"></el-table-column> 
     
-    <el-table-column label="状态" prop="status" width="120"></el-table-column> 
+    <el-table-column label="状态" prop="status" width="120">
+      <template slot-scope="scope">
+        <div v-if="scope.row.status == 1">正常</div>
+        <div v-if="scope.row.status == 0">禁用</div>
+      </template>  
+    </el-table-column> 
     
     <el-table-column label="排序" prop="sort" width="120"></el-table-column> 
     
@@ -70,8 +78,32 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
 
-    <el-dialog :before-close="closeDialog" :visible.sync="dialogFormVisible" title="弹窗操作">
-      此处请使用表单生成器生成form填充 表单默认绑定 formData 如手动修改过请自行修改key
+    <el-dialog :before-close="closeDialog" :visible.sync="dialogFormVisible" :title="dialogTitle">
+      <el-form
+        :inline="true"
+        :model="formData"
+        :rules="rules"
+        label-position="top"
+        label-width="85px"
+        ref="listForm"
+      >
+        <el-form-item label="名称" prop="name" style="width:100%">
+          <el-input autocomplete="off" v-model="formData.name"></el-input>
+        </el-form-item>
+
+        <el-form-item label="是否隐藏" style="width:45%">
+          <el-select placeholder="是否在列表隐藏" v-model="formData.status">
+            <el-option :value="0" label="是"></el-option>
+            <el-option :value="1" label="否"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="排序标记" prop="sort" style="width:45%">
+          <el-input autocomplete="off" v-model.number="formData.sort"></el-input>
+        </el-form-item>
+
+      </el-form>
+
       <div class="dialog-footer" slot="footer">
         <el-button @click="closeDialog">取 消</el-button>
         <el-button @click="enterDialog" type="primary">确 定</el-button>
@@ -101,10 +133,17 @@ export default {
       dialogFormVisible: false,
       visible: false,
       type: "",
+      dialogTitle: '新增关键词',
       deleteVisible: false,
-      multipleSelection: [],formData: {
-        name:null,searchNum:null,documentNum:null,status:null,sort:null,
-      }
+      multipleSelection: [],
+      formData: {
+        name: '',
+        status: 1,
+        sort: '',
+      },
+      rules: {
+        name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
+      },
     };
   },
   filters: {
@@ -125,6 +164,15 @@ export default {
     }
   },
   methods: {
+      // 初始化弹窗内表格方法
+      initForm() {
+        this.$refs.listForm.resetFields()
+        this.formData = {
+          name: '',
+          status: 1,
+          sort: '',
+        }
+      },
       //条件搜索前端看此方法
       onSubmit() {
         this.page = 1
@@ -138,7 +186,7 @@ export default {
         const ids = []
         this.multipleSelection &&
           this.multipleSelection.map(item => {
-            ids.push(item.ID)
+            ids.push(item.id)
           })
         const res = await deleteDocumentKeywordByIds({ ids })
         if (res.code == 0) {
@@ -151,27 +199,20 @@ export default {
         }
       },
     async updateDocumentKeyword(row) {
-      const res = await findDocumentKeyword({ ID: row.ID });
+      const res = await findDocumentKeyword({ id: row.id });
       this.type = "update";
       if (res.code == 0) {
-        this.formData = res.data.redocKeyword;
+        this.formData = res.data;
         this.dialogFormVisible = true;
       }
     },
     closeDialog() {
       this.dialogFormVisible = false;
-      this.formData = {
-        
-          name:null,
-          searchNum:null,
-          documentNum:null,
-          status:null,
-          sort:null,
-      };
+      this.initForm()
     },
     async deleteDocumentKeyword(row) {
       this.visible = false;
-      const res = await deleteDocumentKeyword({ ID: row.ID });
+      const res = await deleteDocumentKeyword({ id: row.id });
       if (res.code == 0) {
         this.$message({
           type: "success",
@@ -181,26 +222,30 @@ export default {
       }
     },
     async enterDialog() {
-      let res;
-      switch (this.type) {
-        case "create":
-          res = await createDocumentKeyword(this.formData);
-          break;
-        case "update":
-          res = await updateDocumentKeyword(this.formData);
-          break;
-        default:
-          res = await createDocumentKeyword(this.formData);
-          break;
-      }
-      if (res.code == 0) {
-        this.$message({
-          type:"success",
-          message:"创建/更改成功"
-        })
-        this.closeDialog();
-        this.getTableData();
-      }
+      this.$refs.listForm.validate(async valid => {
+        if (valid) {
+          let res;
+          switch (this.type) {
+            case "create":
+              res = await createDocumentKeyword(this.formData);
+              break;
+            case "update":
+              res = await updateDocumentKeyword(this.formData);
+              break;
+            default:
+              res = await createDocumentKeyword(this.formData);
+              break;
+          }
+          if (res.code == 0) {
+            this.$message({
+              type:"success",
+              message:"创建/更改成功"
+            })
+            this.closeDialog();
+            this.getTableData();
+          }
+        }
+      })
     },
     openDialog() {
       this.type = "create";

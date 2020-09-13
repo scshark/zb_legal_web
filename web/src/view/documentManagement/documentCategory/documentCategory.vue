@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">        
+      <el-form :inline="true" :model="searchInfo" class="demo-form-inline"> 
+        <el-form-item label="关键词">
+          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        </el-form-item>       
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
@@ -31,6 +34,13 @@
       <el-table-column label="父分类ID" prop="parentId" width="120"></el-table-column> 
       
       <!-- <el-table-column label="分类等级" prop="categoryLevel" width="120"></el-table-column>  -->
+
+      <el-table-column label="状态" prop="hidden" width="120">
+        <template slot-scope="scope">
+          <el-tag type="success" class="el-tag--light" v-if="scope.row.hidden == 0">正常</el-tag>
+          <el-tag type="danger" class="el-tag--light" v-if="scope.row.hidden == 1">禁用</el-tag>
+        </template>    
+      </el-table-column> 
       
       <el-table-column label="排序" prop="sort" width="120"></el-table-column> 
 
@@ -88,8 +98,8 @@
 
         <el-form-item label="是否隐藏" style="width:45%">
           <el-select placeholder="是否在列表隐藏" v-model="formData.hidden">
-            <el-option :value="false" label="否"></el-option>
-            <el-option :value="true" label="是"></el-option>
+            <el-option :value="0" label="否"></el-option>
+            <el-option :value="1" label="是"></el-option>
           </el-select>
         </el-form-item>
 
@@ -133,7 +143,7 @@ export default {
         ID: 0,
         title:'',
         parentId: '',
-        hidden: '',
+        hidden: 1,
         sort: '',
       },
       isEdit: false,
@@ -173,7 +183,7 @@ export default {
       this.$refs.menuForm.resetFields()
       this.formData = {
         ID: 0,
-        hidden: '',
+        hidden: 1,
         parentId: '',
         title: '',
         sort: '',
@@ -280,9 +290,9 @@ export default {
               message: this.isEdit ? '编辑成功' : '添加成功!'
             })
             this.getTableData();
+             this.initForm()
+            this.dialogFormVisible = false
           }
-          this.initForm()
-          this.dialogFormVisible = false
         }
       })
     },
