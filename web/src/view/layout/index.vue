@@ -5,7 +5,7 @@
       <el-aside class="main-cont main-left">
         <div class="tilte">
           <img alt class="logoimg" src="~@/assets/nav_logo.png" />
-          <h2 class="tit-text" v-if="isSider">Gin-Vue-Admin</h2>
+          <h2 class="tit-text" v-if="isSider">政邦后台管理系统</h2>
         </div>
         <Aside class="aside" />
       </el-aside>
