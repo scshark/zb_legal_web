@@ -147,52 +147,12 @@
           <el-input autocomplete="off" v-model="formData.wordFileUrl"></el-input>
         </el-form-item>
 
-        <el-form-item label="pdf下载地址" prop="pdfFileUrl" style="width:90%">
-          <el-input autocomplete="off" v-model="formData.pdfFileUrl"></el-input>
-        </el-form-item>
-
-        <el-form-item label="浏览量" prop="browseNum" style="width:45%">
-          <el-input autocomplete="off" v-model.number="formData.browseNum"></el-input>
-        </el-form-item>
-
-        <el-form-item label="下载量" prop="downloadNum" style="width:45%">
-          <el-input autocomplete="off" v-model.number="formData.downloadNum"></el-input>
-        </el-form-item>
-
         <el-form-item label="虚拟浏览量" prop="browseVirtualNum" style="width:45%">
           <el-input autocomplete="off" v-model.number="formData.browseVirtualNum"></el-input>
         </el-form-item>
 
         <el-form-item label="虚拟下载量" prop="downloadVirtualNum" style="width:45%">
           <el-input autocomplete="off" v-model.number="formData.downloadVirtualNum"></el-input>
-        </el-form-item>
-        
-        <el-form-item label="收藏数量" prop="collectionNum" style="width:45%">
-          <el-input autocomplete="off" v-model.number="formData.collectionNum"></el-input>
-        </el-form-item>
-
-        <el-form-item label="分享数量" prop="shareNum" style="width:45%">
-          <el-input autocomplete="off" v-model.number="formData.shareNum"></el-input>
-        </el-form-item>
-
-        <el-form-item label="发布日期" prop="releasedAt" style="width:45%">
-          <el-date-picker
-            v-model="formData.releasedAt"
-            autocomplete="off"
-            default-value
-            type="datetime"
-            placeholder="选择日期时间">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="最后修改日期" prop="revisedAt" style="width:45%">
-          <el-date-picker
-            v-model="formData.revisedAt"
-            autocomplete="off"
-            default-value
-            type="datetime"
-            placeholder="选择日期时间">
-          </el-date-picker>
         </el-form-item>
       </el-form>
 
@@ -262,15 +222,8 @@ export default {
         title:'',
         docKeyword: [],
         wordFileUrl: '',
-        pdfFileUrl: '',
-        browseNum: 0,
-        downloadNum: 0,
         browseVirtualNum: 0,
         downloadVirtualNum: 0,
-        collectionNum: 0,
-        shareNum: 0,
-        releasedAt: '',
-        revisedAt: '',
         categoriesName: '',
       },
       rules: {
@@ -278,15 +231,8 @@ export default {
         classId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
         docKeyword: [{ required: true, message: '请输关键词后回车', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
-        pdfFileUrl: [{ required: true, message: '请输入pdf文档下载地址', trigger: 'blur' }],
-        browseNum: [{ required: true, message: '请输入浏览量', trigger: 'blur' }],
-        downloadNum: [{ required: true, message: '请输入下载量', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
         downloadVirtualNum: [{ required: true, message: '请输入虚拟下载量', trigger: 'blur' }],
-        collectionNum: [{ required: true, message: '请输入收藏数量', trigger: 'blur' }],
-        shareNum: [{ required: true, message: '请输入分享数量', trigger: 'blur' }],
-        releasedAt: [{ required: true, message: '请选择发布日期', trigger: 'blur' }],
-        revisedAt: [{ required: true, message: '请选择最后修改日期', trigger: 'blur' }],
       },
       keywords: '',
       keywordsArr: [],
@@ -355,15 +301,8 @@ export default {
           title:'',
           docKeyword: [],
           wordFileUrl: '',
-          pdfFileUrl: '',
-          browseNum: 0,
-          downloadNum: 0,
           browseVirtualNum: 0,
           downloadVirtualNum: 0,
-          collectionNum: 0,
-          shareNum: 0,
-          releasedAt: '',
-          revisedAt: '',
           categoriesName: '',
         }
       },
@@ -436,6 +375,15 @@ export default {
           let res;
           switch (this.type) {
             case "create":
+              let addClassArr = []
+              for(var i=0;i<this.formData.classId.length;i++) {
+                for(var a=0;a<this.formData.classId[i].length;a++) {
+                  if(a==this.formData.classId[i].length-1) {
+                    addClassArr.push(this.formData.classId[i][this.formData.classId[i].length-1])
+                  }
+                }
+              }
+              this.formData.classId = addClassArr
               res = await createDocument(this.formData);
               break;
             case "update":
