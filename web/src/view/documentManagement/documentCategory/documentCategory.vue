@@ -143,7 +143,7 @@ export default {
         ID: 0,
         title:'',
         parentId: '',
-        hidden: 1,
+        hidden: 0,
         sort: '',
       },
       isEdit: false,
@@ -183,7 +183,7 @@ export default {
       this.$refs.menuForm.resetFields()
       this.formData = {
         ID: 0,
-        hidden: 1,
+        hidden: 0,
         parentId: '',
         title: '',
         sort: '',

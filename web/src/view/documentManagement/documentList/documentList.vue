@@ -32,48 +32,46 @@
       style="width: 100%"
       tooltip-effect="dark"
     >
-    <el-table-column type="selection" width="55"></el-table-column>
-    <!-- <el-table-column label="日期" width="180">
-         <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
-    </el-table-column> -->
-    
-    <el-table-column label="标题" prop="title" width="350"></el-table-column> 
-    
-    <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
+      <el-table-column type="selection" width="55"></el-table-column>
+      <!-- <el-table-column label="日期" width="180">
+          <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
+      </el-table-column> -->
+      
+      <el-table-column label="标题" prop="title" width="350"></el-table-column> 
+      
+      <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
 
-    <el-table-column label="分类" prop="categoriesName" width="300">
-      <template slot-scope="scope">
-        <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.categoriesName">{{ role }}</el-tag>
-      </template>
-    </el-table-column>
+      <el-table-column label="分类" prop="categoriesName" width="300">
+        <template slot-scope="scope">
+          <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.categoriesName">{{ role }}</el-tag>
+        </template>
+      </el-table-column>
 
-    <el-table-column label="关键词" prop="keywords" width="300">
-      <template slot-scope="scope">
-        <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
-      </template>
-    </el-table-column>
-    
-    <el-table-column label="word文档下载地址" prop="wordFileUrl" width="300"></el-table-column> 
-    
-    <el-table-column label="pdf文档下载地址" prop="pdfFileUrl" width="300"></el-table-column> 
-    
-    <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
-    
-    <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
-    
-    <el-table-column label="虚拟浏览量" prop="browseVirtualNum" width="100"></el-table-column> 
-    
-    <el-table-column label="虚拟下载量" prop="downloadVirtualNum" width="100"></el-table-column> 
-    
-    <el-table-column label="收藏数量" prop="collectionNum" width="90"></el-table-column> 
-    
-    <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column> 
-    
-    <el-table-column label="发布日期" prop="releasedAt" width="250"></el-table-column> 
-    
-    <el-table-column label="最后修改日期" prop="revisedAt" width="250"></el-table-column> 
-    
-      <el-table-column label="按钮组">
+      <el-table-column label="关键词" prop="keywords" width="300">
+        <template slot-scope="scope">
+          <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
+        </template>
+      </el-table-column>
+      
+      <el-table-column label="word文档下载地址" prop="wordFileUrl" width="300"></el-table-column> 
+      
+      <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
+      
+      <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
+      
+      <el-table-column label="虚拟浏览量" prop="browseVirtualNum" width="100"></el-table-column> 
+      
+      <el-table-column label="虚拟下载量" prop="downloadVirtualNum" width="100"></el-table-column> 
+      
+      <el-table-column label="收藏数量" prop="collectionNum" width="90"></el-table-column> 
+      
+      <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column> 
+      
+      <el-table-column label="发布日期" prop="releasedTime" width="250"></el-table-column> 
+      
+      <el-table-column label="最后修改日期" prop="revisedTime" width="250"></el-table-column> 
+      
+      <el-table-column label="按钮组" width="250">
         <template slot-scope="scope">
           <el-button @click="updateDocument(scope.row)" size="small" type="primary">变更</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.visible">
@@ -113,14 +111,11 @@
           <el-input autocomplete="off" v-model="formData.title"></el-input>
         </el-form-item>
 
-        <el-form-item label="关键词" prop="docKeyword" style="width:90%">
+        <el-form-item label="关键词" prop="keywordsArr" style="width:90%">
           <div v-for="(item,index) in keywordsArr" :key="index" class="spanbox">
             <span>{{item}}</span>
             <i class="spanclose" @click="removeitem(index,item)"></i>
           </div>
-
-          <input type="hidden" v-model="formData.docKeyword">
-
           <el-input autocomplete="off" @keyup.enter.native="addlabel" v-model="keywords"></el-input>
         </el-form-item>
 
@@ -229,7 +224,6 @@ export default {
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         classId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
-        docKeyword: [{ required: true, message: '请输关键词后回车', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
         downloadVirtualNum: [{ required: true, message: '请输入虚拟下载量', trigger: 'blur' }],
@@ -346,8 +340,8 @@ export default {
 
       if (res.code == 0) {
         this.formData = res.data.doc;
-        if(res.data.doc.docKeyword) {
-          this.keywordsArr = res.data.doc.docKeyword
+        if(res.data.doc.keywords) {
+          this.keywordsArr = res.data.doc.keywords
         }
         
         // this.dialogFormVisible = true;
