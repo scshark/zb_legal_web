@@ -45,8 +45,8 @@
     
     <el-table-column label="状态" prop="status" width="120">
       <template slot-scope="scope">
-        <div v-if="scope.row.status == 1">正常</div>
-        <div v-if="scope.row.status == 0">禁用</div>
+        <el-tag type="success" class="el-tag--light" v-if="scope.row.status == 1">正常</el-tag>
+        <el-tag type="danger" class="el-tag--light" v-if="scope.row.status == 0">禁用</el-tag>
       </template>  
     </el-table-column> 
     

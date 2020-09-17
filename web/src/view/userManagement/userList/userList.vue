@@ -37,7 +37,7 @@
          <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
     </el-table-column> -->
     
-    <el-table-column label="用户UUID" prop="uuid" width="120"></el-table-column> 
+    <!-- <el-table-column label="用户UUID" prop="uuid" width="120"></el-table-column>  -->
     
     <el-table-column label="用户昵称" prop="nickName" width="120"></el-table-column> 
     
@@ -60,7 +60,7 @@
     
     <el-table-column label="市" prop="city" width="120"></el-table-column> 
     
-    <el-table-column label="区" prop="district" width="120"></el-table-column> 
+    <!-- <el-table-column label="区" prop="district" width="120"></el-table-column>  -->
     
     <el-table-column label="浏览次数" prop="browseNum" width="120"></el-table-column> 
     
@@ -68,8 +68,8 @@
     
     <el-table-column label="用户状态" prop="status" width="120">
       <template slot-scope="scope">
-        <el-tag type="success" class="el-tag--light" v-if="scope.row.hidden == 1">正常</el-tag>
-          <el-tag type="danger" class="el-tag--light" v-if="scope.row.hidden == 0">禁用</el-tag>
+        <el-tag type="success" class="el-tag--light" v-if="scope.row.status == 1">正常</el-tag>
+          <el-tag type="danger" class="el-tag--light" v-if="scope.row.status == 0">禁用</el-tag>
       </template>  
     </el-table-column> 
     
@@ -113,7 +113,7 @@
         </el-form-item>
         <el-form-item label="上传头像" prop="headerImg" required style="width:45%">
           <el-upload
-            :action="`http://zbc.scshark.com/fileUploadAndDownload/upload`"
+            :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
             :on-success="handleAvatarSuccess"
             :headers="{ 'x-token': token }"
             :multiple="false"

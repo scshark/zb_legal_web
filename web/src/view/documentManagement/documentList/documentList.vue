@@ -53,8 +53,6 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="word文档下载地址" prop="wordFileUrl" width="300"></el-table-column> 
-      
       <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
       
       <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
@@ -132,7 +130,7 @@
         <el-form-item label="word下载地址" prop="wordFileUrl" style="width:90%">
           <el-upload
             class="upload-demo"
-            :action="`http://zbc.scshark.com/fileUploadAndDownload/upload`"
+            :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
             :on-success="handleAvatarSuccess"
             :headers="{ 'x-token': token }"
             :multiple="false"
@@ -313,7 +311,7 @@ export default {
         const ids = []
         this.multipleSelection &&
           this.multipleSelection.map(item => {
-            ids.push(item.ID)
+            ids.push(item.id)
           })
         const res = await deleteDocumentByIds({ ids })
         if (res.code == 0) {
@@ -353,7 +351,7 @@ export default {
     },
     async deleteDocument(row) {
       this.visible = false;
-      const res = await deleteDocument({ ID: row.ID });
+      const res = await deleteDocument({ id: row.id });
       if (res.code == 0) {
         this.$message({
           type: "success",
@@ -412,6 +410,7 @@ export default {
       if(categoryData.code == 0) {
         this.options = categoryData.data
       }
+      this.keywordsArr = []
       this.type = "create";
 
       this.dialogFormVisible = true;
