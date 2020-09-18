@@ -41,7 +41,7 @@
     
     <el-table-column label="用户昵称" prop="nickName" width="120"></el-table-column> 
     
-    <el-table-column label="头像" width="100">
+    <el-table-column label="头像" width="120">
           <template slot-scope="scope">
             <img
               :alt="scope.row.headerImg"
@@ -75,7 +75,7 @@
     
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="updateZbUser(scope.row)" size="small" type="primary">变更</el-button>
+          <!-- <el-button @click="updateZbUser(scope.row)" size="small" type="primary">变更</el-button> -->
           <el-button v-if="scope.row.status == 0" @click="updateStatus(scope.row)" size="small" type="success">启用</el-button>
           <el-button v-if="scope.row.status == 1" @click="updateStatus(scope.row)" size="small" type="danger">禁用</el-button>
           <!-- <el-popover placement="top" width="160" v-model="scope.row.visible">
@@ -107,10 +107,10 @@
           <el-input v-model="formData.nickName" placeholder="请输入用户昵称" clearable :style="{width: '100%'}">
           </el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <!-- <el-form-item label="密码" prop="password">
           <el-input v-model="formData.password" placeholder="请输入密码" clearable show-password
             :style="{width: '100%'}"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="上传头像" prop="headerImg" required style="width:45%">
           <el-upload
             :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
@@ -126,7 +126,7 @@
           <el-input v-model="formData.mobile" placeholder="请输入手机号码" clearable :style="{width: '100%'}">
           </el-input>
         </el-form-item>
-        <el-form-item label="注册日期" prop="registered_at">
+        <!-- <el-form-item label="注册日期" prop="registered_at">
           <el-date-picker type="datetime" v-model="formData.registered_at"
             :style="{width: '100%'}" placeholder="请选择日期选择" clearable></el-date-picker>
         </el-form-item>
@@ -144,7 +144,7 @@
         <el-form-item label="下载次数" prop="downloadNum">
           <el-input v-model="formData.downloadNum" clearable :style="{width: '100%'}">
           </el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="用户状态" prop="status">
           <el-select v-model="formData.status" placeholder="请选择用户状态" clearable :style="{width: '100%'}">
             <el-option v-for="(item, index) in userStatus" :key="index" :label="item.label"
@@ -190,13 +190,13 @@ export default {
         nickName: '',
         headerImg: '',
         mobile: '',
-        registered_at: '',
-        province: '',
-        city: '',
-        district: '',
-        browseNum: 0,
-        downloadNum: 0,
         status: 1,
+        // registered_at: '',
+        // province: '',
+        // city: '',
+        // district: '',
+        // browseNum: 0,
+        // downloadNum: 0,
       },
       userStatus: [
         {value: 0, label: '禁用'},
@@ -206,10 +206,10 @@ export default {
       cityOptions: options,
       rules: {
         nickName: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }],
-        password: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }],
+        // password: [{ required: true, message: '请输入登录密码', trigger: 'blur' }],
         headerImg: [{ required: true, message: '请上传用户头像', trigger: 'blur' }],
-        mobile: [{ required: true, message: '请输入用户手机号码', trigger: 'blur' }],
-        registered_at: [{ required: true, message: '请选择用户注册日期', trigger: 'blur' }],
+        // mobile: [{ required: true, message: '请输入用户手机号码', trigger: 'blur' }],
+        // registered_at: [{ required: true, message: '请选择用户注册日期', trigger: 'blur' }],
         // selectedOptions: [{ required: true, message: '请选择所在城市', trigger: 'blur' }],
         status: [{ required: true, message: '请选择用户状态', trigger: 'blur' }],
       },
@@ -243,13 +243,13 @@ export default {
           nickName: '',
           headerImg: '',
           mobile: '',
-          registered_at: '',
-          province: '',
-          city: '',
-          district: '',
-          browseNum: 0,
-          downloadNum: 0,
           status: 1,
+          // registered_at: '',
+          // province: '',
+          // city: '',
+          // district: '',
+          // browseNum: 0,
+          // downloadNum: 0,
         };
         this.selectedOptions = []
       },
@@ -295,10 +295,10 @@ export default {
       this.type = "update";
       if (res.code == 0) {
         this.formData = res.data;
-        this.selectedOptions.push("中国")
-        this.selectedOptions.push(res.data.province)
-        this.selectedOptions.push(res.data.city)
-        this.selectedOptions.push(res.data.district)
+        // this.selectedOptions.push("中国")
+        // this.selectedOptions.push(res.data.province)
+        // this.selectedOptions.push(res.data.city)
+        // this.selectedOptions.push(res.data.district)
         this.dialogFormVisible = true;
       }
     },
