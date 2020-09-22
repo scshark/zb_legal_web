@@ -147,6 +147,17 @@
         <el-form-item label="虚拟下载量" prop="downloadVirtualNum" style="width:45%">
           <el-input autocomplete="off" v-model.number="formData.downloadVirtualNum"></el-input>
         </el-form-item>
+
+        <el-form-item label="富文本" prop="content" style="width:100%">
+          <quill-editor
+              :options="editorOption"
+              @blur="onEditorBlur($event)"
+              @change="onEditorChange($event)"
+              @focus="onEditorFocus($event)"
+              ref="myQuillEditor"
+              v-model="formData.content"
+          ></quill-editor>
+        </el-form-item>
       </el-form>
 
       <div class="dialog-footer" slot="footer">
@@ -187,29 +198,7 @@ export default {
       fileList: [],
       props: { multiple: true },
       isResouceShow: 0,
-      options: [
-        {
-          value: 1,
-          label: '东南',
-          children: [{
-            value: 2,
-            label: '上海',
-            children: [
-              { value: 3, label: '普陀' },
-              { value: 4, label: '黄埔' },
-              { value: 5, label: '徐汇' }
-            ]
-          }]
-        }, {
-          value: 7,
-          label: '江苏',
-          children: [
-            { value: 8, label: '南京' },
-            { value: 9, label: '苏州' },
-            { value: 10, label: '无锡' }
-          ]
-        },
-      ],
+      options: [],
       formData: {
         classId: [],
         title:'',
@@ -218,6 +207,7 @@ export default {
         browseVirtualNum: 0,
         downloadVirtualNum: 0,
         categoriesName: '',
+        content: ''
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
@@ -225,9 +215,11 @@ export default {
         wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
         downloadVirtualNum: [{ required: true, message: '请输入虚拟下载量', trigger: 'blur' }],
+        content: [{ required: true, message: '请输入文书内容', trigger: 'blur' }],
       },
       keywords: '',
       keywordsArr: [],
+      editorOption: {},
     }
   },
   filters: {
@@ -248,9 +240,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters("user", ["token"])
+    ...mapGetters("user", ["token"]),
+    editor() {
+      return this.$refs.myQuillEditor.quill
+    }
   },
   methods: {
+      onEditorBlur() {}, // 失去焦点事件
+      onEditorFocus() {}, // 获得焦点事件
+      onEditorChange() {}, // 内容改变事件
       // 移除标签
       removeitem(index, item) {
         this.keywordsArr.splice(index, 1)
@@ -296,6 +294,7 @@ export default {
           browseVirtualNum: 0,
           downloadVirtualNum: 0,
           categoriesName: '',
+          content: ''
         }
       },
       //条件搜索前端看此方法
