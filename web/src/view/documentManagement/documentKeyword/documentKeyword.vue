@@ -39,7 +39,7 @@
     
     <el-table-column label="名称" prop="name" width="120"></el-table-column> 
     
-    <el-table-column label="搜索量" prop="searchNum" width="120"></el-table-column> 
+    <el-table-column label="点击量" prop="searchNum" width="120"></el-table-column> 
     
     <el-table-column label="文书数量" prop="documentNum" width="120"></el-table-column> 
     

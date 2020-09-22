@@ -46,7 +46,7 @@
 
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="addMenu(scope.row.ID)" size="small" type="primary" icon="el-icon-edit">添加子菜单</el-button>
+          <el-button @click="addMenu(scope.row.ID)" size="small" type="primary" icon="el-icon-edit">添加子分类</el-button>
           <el-button @click="editMenu(scope.row.ID)" size="small" type="primary" icon="el-icon-edit" >编辑</el-button>
           
           <el-popover placement="top" width="160" v-model="scope.row.visible">

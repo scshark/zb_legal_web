@@ -127,17 +127,30 @@
           </el-cascader>
         </el-form-item>
 
-        <el-form-item label="word下载地址" prop="wordFileUrl" style="width:90%">
+        <el-form-item label="word下载地址" prop="wordFileUrl" style="width:45%">
           <el-upload
             class="upload-demo"
             :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
-            :on-success="handleAvatarSuccess"
+            :on-success="wordFileSuccess"
             :headers="{ 'x-token': token }"
             :multiple="false"
             :show-file-list="false">
             <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
           <el-input autocomplete="off" v-model="formData.wordFileUrl"></el-input>
+        </el-form-item>
+
+        <el-form-item label="pdf下载地址" prop="pdfFileUrl" style="width:45%">
+          <el-upload
+            class="upload-demo"
+            :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
+            :on-success="pdfFileSuccess"
+            :headers="{ 'x-token': token }"
+            :multiple="false"
+            :show-file-list="false">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+          <el-input autocomplete="off" v-model="formData.pdfFileUrl"></el-input>
         </el-form-item>
 
         <el-form-item label="虚拟浏览量" prop="browseVirtualNum" style="width:45%">
@@ -204,6 +217,7 @@ export default {
         title:'',
         docKeyword: [],
         wordFileUrl: '',
+        pdfFileUrl: '',
         browseVirtualNum: 0,
         downloadVirtualNum: 0,
         categoriesName: '',
@@ -212,7 +226,8 @@ export default {
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         classId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
-        wordFileUrl: [{ required: true, message: '请输入word文档下载地址', trigger: 'blur' }],
+        wordFileUrl: [{ required: true, message: '请上传word文档下载地址', trigger: 'blur' }],
+        pdfFileUrl: [{ required: true, message: '请上传pdf文档下载地址', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
         downloadVirtualNum: [{ required: true, message: '请输入虚拟下载量', trigger: 'blur' }],
         content: [{ required: true, message: '请输入文书内容', trigger: 'blur' }],
@@ -266,8 +281,11 @@ export default {
         }
         this.keywords = ''
       },
-      handleAvatarSuccess(res, file) {
+      wordFileSuccess(res, file) {
         this.formData.wordFileUrl = res.data.file.url
+      },
+      pdfFileSuccess() {
+        this.formData.pdfFileUrl = res.data.file.url
       },
       classChange(e) {
         //暂时废用
@@ -291,6 +309,7 @@ export default {
           title:'',
           docKeyword: [],
           wordFileUrl: '',
+          pdfFileUrl: '',
           browseVirtualNum: 0,
           downloadVirtualNum: 0,
           categoriesName: '',
