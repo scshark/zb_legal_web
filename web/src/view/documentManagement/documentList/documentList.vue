@@ -37,23 +37,23 @@
           <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
       </el-table-column> -->
       
-      <el-table-column label="标题" prop="title" width="350"></el-table-column> 
+      <el-table-column label="标题" prop="title"></el-table-column> 
       
       <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
 
-      <el-table-column label="分类" prop="categoriesName" width="300">
+      <el-table-column label="分类" prop="categoriesName">
         <template slot-scope="scope">
           <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.categoriesName">{{ role }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column label="关键词" prop="keywords" width="300">
+      <el-table-column label="关键词" prop="keywords">
         <template slot-scope="scope">
           <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
         </template>
       </el-table-column>
       
-      <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
+      <!-- <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
       
       <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
       
@@ -63,13 +63,13 @@
       
       <el-table-column label="收藏数量" prop="collectionNum" width="90"></el-table-column> 
       
-      <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column> 
+      <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column>  -->
       
       <el-table-column label="发布日期" prop="releasedTime" width="250"></el-table-column> 
       
       <el-table-column label="最后修改日期" prop="revisedTime" width="250"></el-table-column> 
       
-      <el-table-column label="按钮组" width="250">
+      <el-table-column label="按钮组">
         <template slot-scope="scope">
           <el-button @click="updateDocument(scope.row)" size="small" type="primary">变更</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.visible">
@@ -284,7 +284,7 @@ export default {
       wordFileSuccess(res, file) {
         this.formData.wordFileUrl = res.data.file.url
       },
-      pdfFileSuccess() {
+      pdfFileSuccess(res, file) {
         this.formData.pdfFileUrl = res.data.file.url
       },
       classChange(e) {
