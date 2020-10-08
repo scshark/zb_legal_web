@@ -8,10 +8,10 @@
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
-        <el-form-item>
+        <!-- <el-form-item>
           <el-button @click="openDialog" type="primary">新增文书</el-button>
-        </el-form-item>
-        <el-form-item>
+        </el-form-item> -->
+        <!-- <el-form-item>
           <el-popover placement="top" v-model="deleteVisible" width="160">
             <p>确定要删除吗？</p>
               <div style="text-align: right; margin: 0">
@@ -20,7 +20,7 @@
               </div>
             <el-button icon="el-icon-delete" size="mini" slot="reference" type="danger">批量删除</el-button>
           </el-popover>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
     </div>
     <el-table
@@ -32,7 +32,7 @@
       style="width: 100%"
       tooltip-effect="dark"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
+      <!-- <el-table-column type="selection" width="55"></el-table-column> -->
       <!-- <el-table-column label="日期" width="180">
           <template slot-scope="scope">{{scope.row.CreatedAt|formatDate}}</template>
       </el-table-column> -->
@@ -41,7 +41,7 @@
       
       <!-- <el-table-column label="内容" prop="content" width="120"></el-table-column>  -->
 
-      <el-table-column label="分类" prop="categoriesName">
+      <!-- <el-table-column label="分类" prop="categoriesName">
         <template slot-scope="scope">
           <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.categoriesName">{{ role }}</el-tag>
         </template>
@@ -51,25 +51,25 @@
         <template slot-scope="scope">
           <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       
-      <!-- <el-table-column label="浏览量" prop="browseNum" width="90"></el-table-column> 
+      <el-table-column label="浏览量" prop="browseNum"></el-table-column> 
       
-      <el-table-column label="下载量" prop="downloadNum" width="90"></el-table-column> 
+      <el-table-column label="下载量" prop="downloadNum"></el-table-column> 
       
-      <el-table-column label="虚拟浏览量" prop="browseVirtualNum" width="100"></el-table-column> 
+      <el-table-column label="虚拟浏览量" prop="browseVirtualNum"></el-table-column> 
       
-      <el-table-column label="虚拟下载量" prop="downloadVirtualNum" width="100"></el-table-column> 
+      <el-table-column label="虚拟下载量" prop="downloadVirtualNum"></el-table-column> 
       
-      <el-table-column label="收藏数量" prop="collectionNum" width="90"></el-table-column> 
+      <el-table-column label="收藏数量" prop="collectionNum"></el-table-column> 
       
-      <el-table-column label="分享数量" prop="shareNum" width="90"></el-table-column>  -->
+      <el-table-column label="分享数量" prop="shareNum"></el-table-column> 
       
-      <el-table-column label="发布日期" prop="releasedTime" width="250"></el-table-column> 
+      <el-table-column label="发布日期" prop="releasedTime"></el-table-column> 
       
-      <el-table-column label="最后修改日期" prop="revisedTime" width="250"></el-table-column> 
+      <el-table-column label="最后修改日期" prop="revisedTime"></el-table-column> 
       
-      <el-table-column label="按钮组">
+      <!-- <el-table-column label="按钮组">
         <template slot-scope="scope">
           <el-button @click="updateDocument(scope.row)" size="small" type="primary">变更</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.visible">
@@ -81,7 +81,7 @@
             <el-button type="danger" icon="el-icon-delete" size="mini" slot="reference">删除</el-button>
           </el-popover>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <el-pagination
