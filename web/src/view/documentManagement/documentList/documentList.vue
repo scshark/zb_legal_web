@@ -117,12 +117,12 @@
           <el-input autocomplete="off" @keyup.enter.native="addlabel" v-model="keywords"></el-input>
         </el-form-item>
 
-        <el-form-item label="分类" prop="classId" style="width:90%">
+        <el-form-item label="分类" prop="categoryId" style="width:90%">
           <el-cascader
             :options="options"
             :props="props"
             :key="isResouceShow"
-            v-model="formData.classId"
+            v-model="formData.categoryId"
             clearable>
           </el-cascader>
         </el-form-item>
@@ -213,7 +213,7 @@ export default {
       isResouceShow: 0,
       options: [],
       formData: {
-        classId: [],
+        categoryId: [],
         title:'',
         docKeyword: [],
         wordFileUrl: '',
@@ -225,7 +225,7 @@ export default {
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        classId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
+        categoryId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请上传word文档下载地址', trigger: 'blur' }],
         pdfFileUrl: [{ required: true, message: '请上传pdf文档下载地址', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
@@ -298,14 +298,14 @@ export default {
             }
           }
         }
-        this.formData.classId = classArr
+        this.formData.categoryId = classArr
       },
       // 初始化弹窗内表格方法
       initForm() {
         this.checkFlag = false
         this.$refs.listForm.resetFields()
         this.formData = {
-          classId: [],
+          categoryId: [],
           title:'',
           docKeyword: [],
           wordFileUrl: '',
@@ -386,26 +386,26 @@ export default {
           switch (this.type) {
             case "create":
               let addClassArr = []
-              for(var i=0;i<this.formData.classId.length;i++) {
-                for(var a=0;a<this.formData.classId[i].length;a++) {
-                  if(a==this.formData.classId[i].length-1) {
-                    addClassArr.push(this.formData.classId[i][this.formData.classId[i].length-1])
+              for(var i=0;i<this.formData.categoryId.length;i++) {
+                for(var a=0;a<this.formData.categoryId[i].length;a++) {
+                  if(a==this.formData.categoryId[i].length-1) {
+                    addClassArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
                   }
                 }
               }
-              this.formData.classId = addClassArr
+              this.formData.categoryId = addClassArr
               res = await createDocument(this.formData);
               break;
             case "update":
               let classArr = []
-              for(var i=0;i<this.formData.classId.length;i++) {
-                for(var a=0;a<this.formData.classId[i].length;a++) {
-                  if(a==this.formData.classId[i].length-1) {
-                    classArr.push(this.formData.classId[i][this.formData.classId[i].length-1])
+              for(var i=0;i<this.formData.categoryId.length;i++) {
+                for(var a=0;a<this.formData.categoryId[i].length;a++) {
+                  if(a==this.formData.categoryId[i].length-1) {
+                    classArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
                   }
                 }
               }
-              this.formData.classId = classArr
+              this.formData.categoryId = classArr
               res = await updateDocument(this.formData);
               break;
             default:
