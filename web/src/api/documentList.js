@@ -91,7 +91,7 @@ export const findDocument = (params) => {
 // @Param data body model.Document true "用id查询Document已选中的分类"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
 // @Router /doc/findDocument [get]
-export const findDocumentClass = (params) => {
+export const findDocumentCategory = (params) => {
     return service({
         url: "/doc/getAllCategoryByDoc",
         method: 'get',
@@ -100,16 +100,47 @@ export const findDocumentClass = (params) => {
 }
 
 // @Tags Document
-// @Summary 查询所有的分类分类
+// @Summary 用id查询Document类型（包括已选中）
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body model.Document true "查询所有的分类分类"
+// @Param data body model.Document true "用id查询Document类型（包括已选中）"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
-// @Router /doc/findDocument [get]
+// @Router /doc/getAllClassByDoc [get]
+export const findDocumentClass = (params) => {
+    return service({
+        url: "/doc/getAllClassByDoc",
+        method: 'get',
+        params
+    })
+}
+
+// @Tags Document
+// @Summary 查询所有的文书分类
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body model.Document true "查询所有的文书分类"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
+// @Router /docCategory/getAllCategory [get]
 export const getAllCategory = (params) => {
     return service({
         url: "/docCategory/getAllCategory",
+        method: 'get',
+    })
+}
+
+// @Tags Document
+// @Summary 查询所有的文书类型
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body model.Document true "查询所有的文书类型"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"查询成功"}"
+// @Router /docClass/getAllClass [get]
+export const getAllClass = (params) => {
+    return service({
+        url: "/docClass/getAllClass",
         method: 'get',
     })
 }

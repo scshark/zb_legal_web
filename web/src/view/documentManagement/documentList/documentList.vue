@@ -47,6 +47,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="类型" prop="classesName">
+        <template slot-scope="scope">
+          <el-tag class="el-tag--light" :key="role" v-for="role in scope.row.classesName">{{ role }}</el-tag>
+        </template>
+      </el-table-column>
+
       <el-table-column label="关键词" prop="keywords">
         <template slot-scope="scope">
           <el-tag type="success" class="el-tag--light" :key="index" v-for="(role, index) in scope.row.keywords">{{ role }}</el-tag>
@@ -127,6 +133,16 @@
           </el-cascader>
         </el-form-item>
 
+        <el-form-item label="文书类型" prop="classId" style="width:90%">
+          <el-cascader
+            :options="calssOptions"
+            :key="isClassShow"
+            v-model="formData.classId"
+            filterable
+            clearable>
+          </el-cascader>
+        </el-form-item>
+
         <el-form-item label="word下载地址" prop="wordFileUrl" style="width:45%">
           <el-upload
             class="upload-demo"
@@ -188,8 +204,10 @@ import {
     deleteDocumentByIds,
     updateDocument,
     findDocument,
+    findDocumentCategory,
     findDocumentClass,
     getAllCategory,
+    getAllClass,
     getDocumentList
 } from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
@@ -212,8 +230,12 @@ export default {
       props: { multiple: true },
       isResouceShow: 0,
       options: [],
+      calssOptions: [],
+      isClassShow: 0,
+      isCategory: true,
       formData: {
         categoryId: [],
+        classId: [],
         title:'',
         docKeyword: [],
         wordFileUrl: '',
@@ -221,11 +243,12 @@ export default {
         browseVirtualNum: 0,
         downloadVirtualNum: 0,
         categoriesName: '',
+        classesName: '',
         content: ''
       },
       rules: {
         title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        categoryId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
+        // categoryId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
         wordFileUrl: [{ required: true, message: '请上传word文档下载地址', trigger: 'blur' }],
         pdfFileUrl: [{ required: true, message: '请上传pdf文档下载地址', trigger: 'blur' }],
         browseVirtualNum: [{ required: true, message: '请输入虚拟浏览量', trigger: 'blur' }],
@@ -306,6 +329,7 @@ export default {
         this.$refs.listForm.resetFields()
         this.formData = {
           categoryId: [],
+          classId: [],
           title:'',
           docKeyword: [],
           wordFileUrl: '',
@@ -313,6 +337,7 @@ export default {
           browseVirtualNum: 0,
           downloadVirtualNum: 0,
           categoriesName: '',
+          classesName: '',
           content: ''
         }
       },
@@ -344,23 +369,28 @@ export default {
     async updateDocument(row) {
       this.dialogTitle = '编辑文书'
       this.options = []
+      this.calssOptions = []
+      ++this.isClassShow
       ++this.isResouceShow
       const res = await findDocument({ id: row.id });
+      const resCategory = await findDocumentCategory({ id: row.id });
       const resClass = await findDocumentClass({ id: row.id });
       this.type = "update";
       
+      if(resCategory.code == 0) {
+        this.options = resCategory.data
+      }
       if(resClass.code == 0) {
-        this.options = resClass.data
-        this.dialogFormVisible = true;
+        this.calssOptions = resClass.data
       }
 
       if (res.code == 0) {
-        this.formData = res.data.doc;
+        this.formData = res.data.doc
         if(res.data.doc.keywords) {
           this.keywordsArr = res.data.doc.keywords
         }
         
-        // this.dialogFormVisible = true;
+        this.dialogFormVisible = true;
       } 
     },
     closeDialog() {
@@ -385,27 +415,43 @@ export default {
           let res;
           switch (this.type) {
             case "create":
-              let addClassArr = []
+              let addCategoryArr = []
               for(var i=0;i<this.formData.categoryId.length;i++) {
                 for(var a=0;a<this.formData.categoryId[i].length;a++) {
                   if(a==this.formData.categoryId[i].length-1) {
-                    addClassArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+                    addCategoryArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
                   }
                 }
               }
-              this.formData.categoryId = addClassArr
+
+              let addClassArr = []
+              for(var b=0;b<this.formData.classId.length;b++) {
+                if(b == this.formData.classId.length-1) {
+                    addClassArr.push(this.formData.classId[b])
+                  }
+              }
+              this.formData.categoryId = addCategoryArr
+              this.formData.classId = addClassArr
               res = await createDocument(this.formData);
               break;
             case "update":
-              let classArr = []
+              let addCategoryArr2 = []
               for(var i=0;i<this.formData.categoryId.length;i++) {
                 for(var a=0;a<this.formData.categoryId[i].length;a++) {
                   if(a==this.formData.categoryId[i].length-1) {
-                    classArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+                    addCategoryArr2.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
                   }
                 }
               }
-              this.formData.categoryId = classArr
+
+              let addClassArr2 = []
+              for(var b=0;b<this.formData.classId.length;b++) {
+                if(b == this.formData.classId.length-1) {
+                    addClassArr2.push(this.formData.classId[b])
+                  }
+              }
+              this.formData.categoryId = addCategoryArr2
+              this.formData.classId = addClassArr2
               res = await updateDocument(this.formData);
               break;
             default:
@@ -425,8 +471,12 @@ export default {
     },
     async openDialog() {
       const categoryData = await getAllCategory();
+      const classData = await getAllClass();
       if(categoryData.code == 0) {
         this.options = categoryData.data
+      }
+      if(classData.code == 0) {
+        this.calssOptions = classData.data
       }
       this.keywordsArr = []
       this.type = "create";
