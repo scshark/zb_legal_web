@@ -31,7 +31,7 @@
       
       <el-table-column label="分类名称" prop="title" min-width="120"></el-table-column> 
       
-      <el-table-column label="父分类ID" prop="parentId" width="120"></el-table-column> 
+      <!-- <el-table-column label="父分类ID" prop="parentId" width="120"></el-table-column>  -->
       
       <!-- <el-table-column label="分类等级" prop="categoryLevel" width="120"></el-table-column>  -->
 
