@@ -48,7 +48,6 @@
         <template slot-scope="scope">
           <el-button @click="addMenu(scope.row.id)" size="small" type="primary" icon="el-icon-edit">添加子分类</el-button>
           <el-button @click="editMenu(scope.row.id)" size="small" type="primary" icon="el-icon-edit" >编辑</el-button>
-          
           <el-popover placement="top" width="160" v-model="scope.row.visible">
             <p>确定要删除吗？</p>
             <div style="text-align: right; margin: 0">
@@ -57,6 +56,8 @@
             </div>
             <el-button type="danger" icon="el-icon-delete" size="mini" slot="reference">删除</el-button>
           </el-popover>
+          <el-button @click="bindMenu(scope.row.id)" size="small" type="success" icon="el-icon-document-add" >绑定文书</el-button>
+          <el-button @click="unbindMenu(scope.row.id)" size="small" type="warning" icon="el-icon-document-remove" >解绑文书</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,6 +73,7 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
 
+    <!-- 新增/编辑 弹窗 start -->
     <el-dialog :before-close="closeDialog" :title="dialogTitle" :visible.sync="dialogFormVisible">
       <el-form
         :inline="true"
@@ -113,6 +115,79 @@
         <el-button @click="enterDialog" type="primary">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 新增/编辑 弹窗 end -->
+
+
+    <!-- 文书绑定/解绑 弹窗 start -->
+    <el-dialog :before-close="closeBindDialog" :title="dialogTitle" :visible.sync="dialogShow">
+      <div class="search-term">
+        <el-form :inline="true" class="demo-form-inline" > 
+          <el-form-item label="关键词" v-if="isBind">
+            <el-input placeholder="关键词" v-model="keyword"></el-input>
+          </el-form-item>       
+          <el-form-item v-if="isBind">
+            <el-button @click="searchSubmit" type="primary">查询</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="bindSubmit()" v-if="isBind" type="primary">批量绑定</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="unbindSubmit()" v-if="!isBind" type="danger">批量解绑</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
+      <el-table
+      :data="dialogData"
+      @selection-change="dialogDataChange"
+      border
+      ref="multipleDialogData"
+      stripe
+      style="width: 100%"
+      tooltip-effect="dark"
+      > 
+        <el-table-column type="selection" width="55" :selectable="canSelect"></el-table-column>
+        
+        <el-table-column label="标题" prop="title"></el-table-column> 
+
+        <el-table-column label="分类" prop="categoriesName">
+        <template slot-scope="scope">
+          <el-tag class="el-tag--light" :key="index" v-for="(role, index) in scope.row.categoriesName">{{ role }}</el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="类型" prop="classesName">
+        <template slot-scope="scope">
+          <el-tag class="el-tag--light" :key="index" v-for="(role, index) in scope.row.classesName">{{ role }}</el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="状态" prop="pickStatus" width="120">
+        <template slot-scope="scope">
+          <el-tag type="success" class="el-tag--light" v-if="scope.row.pickStatus == 0">未绑定</el-tag>
+          <el-tag type="danger" class="el-tag--light" v-if="scope.row.pickStatus == 1">已绑定</el-tag>
+        </template>    
+      </el-table-column> 
+
+        <el-table-column label="发布日期" prop="releasedTime"></el-table-column> 
+      </el-table>
+
+      <el-pagination
+        :current-page="dialogPage"
+        :page-size="dialogPageSize"
+        :page-sizes="[10, 30, 50, 100]"
+        :total="dialogTotal"
+        @current-change="dialogCurrentChange"
+        @size-change="dialogSizeChange"
+        layout="total, sizes, prev, pager, next, jumper"
+      ></el-pagination>
+
+      <!-- <div class="dialog-footer" slot="footer">
+        <el-button @click="closeBindDialog">取 消</el-button>
+        <el-button @click="enterDialog" type="primary">确 定</el-button>
+      </div> -->
+    </el-dialog>
+    <!-- 文书绑定/解绑弹窗 end -->
   </div>
 </template>
 
@@ -123,7 +198,11 @@ import {
     deleteDocumentClassByIds,
     updateDocumentClass,
     findDocumentClass,
-    getDocumentClassList
+    getDocumentClassList,
+    getDocumentByPickList,
+    classBindDocument,
+    getClassBoundList,
+    classUnbindDocument
 } from "@/api/documentClass";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
 import infoList from "@/components/mixins/infoList";
@@ -135,6 +214,7 @@ export default {
     return {
       listApi: getDocumentClassList,
       dialogFormVisible: false,
+      dialogShow: false,
       visible: false,
       type: "",
       deleteVisible: false,
@@ -157,6 +237,14 @@ export default {
           title: '根目录'
         }
       ],
+      dialogDataSelection: [],
+      isBind: true,
+      classId: '',
+      keyword: '',
+      dialogData: [],
+      dialogPage: 1,
+      dialogTotal: 10,
+      dialogPageSize: 10,
     };
   },
   filters: {
@@ -261,6 +349,9 @@ export default {
       this.dialogFormVisible = false;
       this.initForm()
     },
+    closeBindDialog() {
+      this.dialogShow = false;
+    },
     async deleteDocumentClass(row) {
       this.visible = false;
       const res = await deleteDocumentClass({ id: row.id });
@@ -312,7 +403,108 @@ export default {
       this.setOptions()
       this.type = "update";
       this.dialogFormVisible = true
-    }
+    },
+    async bindMenu(id) {
+      this.dialogTitle = '绑定文书'
+      this.classId = id
+      this.dialogData = []
+      this.dialogPage = 1
+      this.dialogTotal = 10
+      this.dialogPageSize = 10
+      this.isBind = true
+      await this.getDialogData(this.classId)
+      this.dialogShow = true
+    },
+    async unbindMenu(id) {
+      this.dialogTitle = '解绑文书'
+      this.classId = id
+      this.dialogData = []
+      this.dialogPage = 1
+      this.dialogTotal = 10
+      this.dialogPageSize = 10
+      this.isBind = false
+      await this.getDialogData(this.classId)
+      this.dialogShow = true
+    },
+    async getDialogData(id, page = this.dialogPage, pageSize = this.dialogPageSize, keyword = this.keyword) {
+      let pick_class_id = id
+      let documentList = ''
+      if(this.isBind) {
+        documentList = await getDocumentByPickList({ pick_class_id, page, pageSize, keyword })
+      } else {
+        documentList = await getClassBoundList({ pick_class_id, page, pageSize, keyword })
+      }
+      
+      this.dialogData = documentList.data.list
+      this.dialogTotal = documentList.data.total
+      this.dialogPage = documentList.data.page
+      this.dialogPageSize = documentList.data.pageSize
+    },
+    dialogDataChange(val) {
+      this.dialogDataSelection = val
+    },
+    dialogSizeChange(val) {
+      this.dialogPageSize = val
+      this.getDialogData(this.classId)
+    },
+    dialogCurrentChange(val) {
+        this.dialogPage = val
+        this.getDialogData(this.classId)
+    },
+    async bindSubmit() {
+      const ids = []
+      this.dialogDataSelection &&
+      this.dialogDataSelection.map(item => {
+        ids.push(item.id)
+      })
+      let class_id = this.classId
+      const res = await classBindDocument({ class_id, ids })
+      if (res.code == 0) {
+        this.$message({
+          type:"success",
+          message:"绑定成功"
+        })
+        // this.closeBindDialog();
+        this.getDialogData(this.classId);
+      }  
+    },
+    async unbindSubmit() {
+      const ids = []
+      this.dialogDataSelection &&
+      this.dialogDataSelection.map(item => {
+        ids.push(item.id)
+      })
+      let class_id = this.classId
+      const res = await classUnbindDocument({ class_id, ids })
+      if (res.code == 0) {
+        this.$message({
+          type:"success",
+          message:"解绑成功"
+        })
+        // this.closeBindDialog();
+        this.getDialogData(this.classId);
+      }  
+    },
+    searchSubmit() {
+      this.pageSize = 1
+      this.dialogPageSize = 10        
+      this.getDialogData(this.classId)
+    },
+    canSelect(row) {
+      if(this.isBind) {
+        if(row.pickStatus) {
+          return false
+        }else {
+          return true
+        }
+      } else {
+        if(row.pickStatus) {
+           return true
+        }else {
+          return false
+        }
+      }
+    },
   },
   async created() {
     await this.getTableData();}
@@ -320,4 +512,59 @@ export default {
 </script>
 
 <style>
+.el-tag--light {
+  margin: 10px 5px;
+}
+.spanbox {
+  line-height: 30px;
+  margin: 2px;
+  padding: 0 10px;
+  background-color: #1abc9c;
+  color: white;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  overflow: hidden;
+  transition: 0.25s linear;
+}
+
+.spanbox:hover {
+  padding: 0px 17px 0 3px;
+}
+
+.spanclose {
+  color: white;
+  padding: 0 10px 0 0;
+  cursor: pointer;
+  font-size: 12px;
+  position: absolute;
+  right: -3px;
+  text-align: right;
+  text-decoration: none;
+  top: 0;
+  width: 100%;
+  bottom: 0;
+  z-index: 2;
+  opacity: 0;
+  filter: "alpha(opacity=0)";
+  transition: opacity 0.25s linear;
+  font-style: normal;
+}
+
+.spanbox:hover .spanclose {
+  padding: 0 10px 5px 0;
+  opacity: 1;
+  -webkit-filter: none;
+  filter: none;
+}
+
+.spanclose:after {
+  content: "x";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 27px;
+}
 </style>

@@ -83,12 +83,12 @@ export const findDocumentClass = (params) => {
 }
 
 
-// @Tags DocumentCategory
-// @Summary 分页获取DocumentCategory列表
+// @Tags getDocumentClassList
+// @Summary 分页获取getDocumentClassList列表
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-// @Param data body request.PageInfo true "分页获取DocumentCategory列表"
+// @Param data body request.PageInfo true "分页获取getDocumentClassList列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /docClass/getDocumentClassList [get]
 export const getDocumentClassList = (params) => {
@@ -96,5 +96,69 @@ export const getDocumentClassList = (params) => {
         url: "/docClass/getDocumentClassList",
         method: 'get',
         params
+    })
+}
+
+// @Tags getDocumentByPickList
+// @Summary 分页获取getDocumentByPickList列表
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "分页获取getDocumentByPickList列表"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /docClass/getDocumentClassList [get]
+export const getDocumentByPickList = (params) => {
+    return service({
+        url: "/doc/getDocumentByPickList",
+        method: 'get',
+        params
+    })
+}
+
+// @Tags classBindDocument
+// @Summary classBindDocument
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "classBindDocument"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /docClass/classBindDocument [get]
+export const classBindDocument = (data) => {
+    return service({
+        url: "/docClass/classBindDocument",
+        method: 'post',
+        data
+    })
+}
+
+// @Tags getClassBoundList
+// @Summary getClassBoundList
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "getClassBoundList"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /docClass/getClassBoundList [get]
+export const getClassBoundList = (params) => {
+    return service({
+        url: "/docClass/getClassBoundList",
+        method: 'get',
+        params
+    })
+}
+
+// @Tags classUnbindDocument
+// @Summary classUnbindDocument
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "classUnbindDocument"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /docClass/classUnbindDocument [get]
+export const classUnbindDocument = (data) => {
+    return service({
+        url: "/docClass/classUnbindDocument",
+        method: 'post',
+        data
     })
 }

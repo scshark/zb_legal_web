@@ -129,6 +129,7 @@
             :props="props"
             :key="isResouceShow"
             v-model="formData.categoryId"
+            filterable
             clearable>
           </el-cascader>
         </el-form-item>
@@ -136,6 +137,7 @@
         <el-form-item label="文书类型" prop="classId" style="width:90%">
           <el-cascader
             :options="calssOptions"
+            :props="props"
             :key="isClassShow"
             v-model="formData.classId"
             filterable
@@ -426,9 +428,11 @@ export default {
 
               let addClassArr = []
               for(var b=0;b<this.formData.classId.length;b++) {
-                if(b == this.formData.classId.length-1) {
-                    addClassArr.push(this.formData.classId[b])
+                for(var c=0;c<this.formData.classId[b].length;c++) {
+                  if(c==this.formData.classId[b].length-1) {
+                    addClassArr.push(this.formData.classId[b][this.formData.classId[b].length-1])
                   }
+                }
               }
               this.formData.categoryId = addCategoryArr
               this.formData.classId = addClassArr
@@ -446,9 +450,11 @@ export default {
 
               let addClassArr2 = []
               for(var b=0;b<this.formData.classId.length;b++) {
-                if(b == this.formData.classId.length-1) {
-                    addClassArr2.push(this.formData.classId[b])
+                for(var c=0;c<this.formData.classId[b].length;c++) {
+                  if(c==this.formData.classId[b].length-1) {
+                    addClassArr2.push(this.formData.classId[b][this.formData.classId[b].length-1])
                   }
+                }
               }
               this.formData.categoryId = addCategoryArr2
               this.formData.classId = addClassArr2
