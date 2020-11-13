@@ -418,44 +418,54 @@ export default {
           switch (this.type) {
             case "create":
               let addCategoryArr = []
-              for(var i=0;i<this.formData.categoryId.length;i++) {
-                for(var a=0;a<this.formData.categoryId[i].length;a++) {
-                  if(a==this.formData.categoryId[i].length-1) {
-                    addCategoryArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+              if(this.formData.categoryId) {
+                for(var i=0;i<this.formData.categoryId.length;i++) {
+                  for(var a=0;a<this.formData.categoryId[i].length;a++) {
+                    if(a==this.formData.categoryId[i].length-1) {
+                      addCategoryArr.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+                    }
                   }
                 }
               }
 
               let addClassArr = []
-              for(var b=0;b<this.formData.classId.length;b++) {
-                for(var c=0;c<this.formData.classId[b].length;c++) {
-                  if(c==this.formData.classId[b].length-1) {
-                    addClassArr.push(this.formData.classId[b][this.formData.classId[b].length-1])
+              if(this.formData.classId) {
+                for(var b=0;b<this.formData.classId.length;b++) {
+                  for(var c=0;c<this.formData.classId[b].length;c++) {
+                    if(c==this.formData.classId[b].length-1) {
+                      addClassArr.push(this.formData.classId[b][this.formData.classId[b].length-1])
+                    }
                   }
                 }
               }
+              
               this.formData.categoryId = addCategoryArr
               this.formData.classId = addClassArr
               res = await createDocument(this.formData);
               break;
             case "update":
               let addCategoryArr2 = []
-              for(var i=0;i<this.formData.categoryId.length;i++) {
-                for(var a=0;a<this.formData.categoryId[i].length;a++) {
-                  if(a==this.formData.categoryId[i].length-1) {
-                    addCategoryArr2.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+              if(this.formData.categoryId) {
+                for(var i=0;i<this.formData.categoryId.length;i++) {
+                  for(var a=0;a<this.formData.categoryId[i].length;a++) {
+                    if(a==this.formData.categoryId[i].length-1) {
+                      addCategoryArr2.push(this.formData.categoryId[i][this.formData.categoryId[i].length-1])
+                    }
                   }
                 }
               }
 
               let addClassArr2 = []
-              for(var b=0;b<this.formData.classId.length;b++) {
-                for(var c=0;c<this.formData.classId[b].length;c++) {
-                  if(c==this.formData.classId[b].length-1) {
-                    addClassArr2.push(this.formData.classId[b][this.formData.classId[b].length-1])
+              if(this.formData.classId) {
+                for(var b=0;b<this.formData.classId.length;b++) {
+                  for(var c=0;c<this.formData.classId[b].length;c++) {
+                    if(c==this.formData.classId[b].length-1) {
+                      addClassArr2.push(this.formData.classId[b][this.formData.classId[b].length-1])
+                    }
                   }
                 }
               }
+              
               this.formData.categoryId = addCategoryArr2
               this.formData.classId = addClassArr2
               res = await updateDocument(this.formData);
