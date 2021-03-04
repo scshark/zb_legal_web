@@ -53,6 +53,11 @@ export default {
     // 关联树 确认方法
     async relation() {
       const checkArr = this.$refs.menuTree.getCheckedNodes(false, true)
+
+      for(var i=0; i<checkArr.length; i++) {
+        checkArr[i].DeletedAt = checkArr[i].CreatedAt
+      }
+
       const res = await addMenuAuthority({
         menus: checkArr,
         authorityId: this.row.authorityId

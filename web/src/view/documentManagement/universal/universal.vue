@@ -9,7 +9,7 @@
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button @click="openDialog" type="primary">新增热搜文书</el-button>
+          <el-button @click="openDialog" type="primary">新增通用文书</el-button>
         </el-form-item>
         <el-form-item>
           <el-popover placement="top" v-model="deleteVisible" width="160">
@@ -36,12 +36,30 @@
       
       <el-table-column label="标题" prop="title"></el-table-column> 
 
-      <el-table-column label="状态" prop="status"></el-table-column> 
+      <el-table-column label="状态" prop="status">
+          <template slot-scope="{row,$index}">
+              <div v-if="!showEdit[$index]">
+                  <el-tag type="danger" class="el-tag--light" v-if="row.status == 0">隐藏</el-tag>
+                  <el-tag type="success" class="el-tag--light" v-if="row.status == 1">显示</el-tag>
+              </div>
 
-      <el-table-column label="热搜排序" prop="hotSearchSort">
+              <!-- <el-input size="small" v-model="row.status" v-if="showEdit[$index]" placeholder="请输入内容" @change="sortEdit($index, row)"></el-input> -->
+
+              <el-select  v-if="showEdit[$index]" v-model="row.status" filterable placeholder="请选择">
+                  <el-option
+                    v-for="item in statusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+              </el-select>
+        </template>    
+      </el-table-column> 
+
+      <el-table-column label="排序" prop="hotSearchSort">
          <template slot-scope="{row,$index}">
-            <el-input size="small" v-model="row.hotSearchSort" v-if="showEdit[$index]" placeholder="请输入内容" @change="sortEdit($index, row)"></el-input>
-            <span v-if="!showEdit[$index]">{{row.hotSearchSort}}</span>
+            <el-input size="small" v-model="row.sort" v-if="showEdit[$index]" placeholder="请输入内容" @change="sortEdit($index, row)"></el-input>
+            <span v-if="!showEdit[$index]">{{row.sort}}</span>
           </template>
       </el-table-column> 
       
@@ -75,7 +93,17 @@
     ></el-pagination>
 
     <el-dialog :before-close="closeDialog" :title="dialogTitle" :visible.sync="dialogFormVisible">
-      
+      <div class="search-term">
+        <el-form :inline="true" :model="dialogInfo" class="demo-form-inline">     
+          <el-form-item label="关键词">
+            <el-input placeholder="关键词" v-model="dialogInfo.keyword"></el-input>
+          </el-form-item>                 
+          <el-form-item>
+            <el-button @click="dialogOnSubmit" type="primary">查询</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
       <el-table
       :data="dialogData"
       @selection-change="dialogDataChange"
@@ -85,7 +113,7 @@
       style="width: 100%"
       tooltip-effect="dark"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column type="selection" :selectable='checkboxT' width="55"></el-table-column>
         
         <el-table-column label="标题" prop="title"></el-table-column> 
         
@@ -112,15 +140,13 @@
 
 <script>
 import {
-    getHotSearchList,
-    updateHotSearchSort,
-    deleteHotSearchByIds,
-    deleteHotSearch,
-    createHotSearch
-} from "@/api/hotSearch";  //  此处请自行替换地址
-import {
-    getDocumentList
-} from "@/api/documentList";  //  此处请自行替换地址
+    addGenericDocument,
+    deleteGenericDoc,
+    deleteGenericDocByIds,
+    updateGenericDoc,
+    getGenericDocumentList,
+    getGenericDocPickList
+} from "@/api/universal";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
 import infoList from "@/components/mixins/infoList";
 import { mapGetters } from "vuex";
@@ -130,13 +156,13 @@ export default {
   mixins: [infoList],
   data() {
     return {
-      listApi: getHotSearchList,
+      listApi: getGenericDocumentList,
       dialogFormVisible: false,
       visible: false,
       deleteVisible: false,
       multipleSelection: [],
       dialogDataSelection: [],
-      dialogTitle: '新增热搜文书',
+      dialogTitle: '新增通用文书',
       formData: {
         id: '',
         title: '',
@@ -149,6 +175,17 @@ export default {
       dialogTotal: 10,
       dialogPageSize: 10,
       showEdit: [], //显示编辑框
+      statusOptions: [
+        {
+            value: 1,
+            label: '显示'
+        },
+        {
+            value: 0,
+            label: '隐藏'
+        }
+      ],
+      dialogInfo: {}
     }
   },
   filters: {
@@ -175,6 +212,13 @@ export default {
     }
   },
   methods: {
+    checkboxT(row,index){
+      if(row.isPick){
+        return 0
+      }else {
+        return 1
+      }
+    },
     editBtn(index, row) {
       this.$set(this.showEdit,index,true)
     },
@@ -184,15 +228,17 @@ export default {
     async updateSort(index, row) {
       let updateData = {
         id: row.id,
-        sort: Number(row.hotSearchSort)
+        sort: Number(row.sort),
+        status: Number(row.status)
       }
-      const res = await updateHotSearchSort(updateData)
+      const res = await updateGenericDoc(updateData)
       if (res.code == 0) {
         this.$message({
           type:"success",
           message:"更改成功"
         })
         this.$set(this.showEdit,index,false)
+        this.getTableData();
       } else {
         this.$message({
           type:"error",
@@ -232,7 +278,7 @@ export default {
         this.multipleSelection.map(item => {
           ids.push(item.id)
         })
-      const res = await deleteHotSearchByIds({ ids })
+      const res = await deleteGenericDocByIds({ ids })
       if (res.code == 0) {
         this.$message({
           type: 'success',
@@ -244,11 +290,13 @@ export default {
     },
     closeDialog() {
       this.dialogFormVisible = false;
+      this.dialogInfo = {}
+      this.dialogPage = 1
       // this.initForm()
     },
     async deleteHotSearch(row) {
       this.visible = false;
-      const res = await deleteHotSearch({ id: row.id });
+      const res = await deleteGenericDoc({ id: row.id });
       if (res.code == 0) {
         this.$message({
           type: "success",
@@ -263,7 +311,7 @@ export default {
       this.dialogDataSelection.map(item => {
         ids.push(item.id)
       })
-      const res = await createHotSearch({ ids })
+      const res = await addGenericDocument({ ids })
       if (res.code == 0) {
         this.$message({
           type:"success",
@@ -280,11 +328,13 @@ export default {
       this.dialogFormVisible = true;
     },
     async getDialogData(page = this.dialogPage, pageSize = this.dialogPageSize) {
-      const documentList = await getDocumentList({ page, pageSize })
+      const documentList = await getGenericDocPickList({ page, pageSize, ...this.dialogInfo })
       this.dialogData = documentList.data.list
       this.dialogTotal = documentList.data.total
       this.dialogPage = documentList.data.page
       this.dialogPageSize = documentList.data.pageSize
+
+      console.log(this.dialogPage)
     },
     dialogSizeChange(val) {
       this.dialogPageSize = val
@@ -294,6 +344,11 @@ export default {
         this.dialogPage = val
         this.openDialog()
     },
+    dialogOnSubmit() {
+      this.dialogPage = 1
+      this.dialogPageSize = 10                
+      this.getDialogData()
+    }
   },
   async created() {
     await this.getTableData();
