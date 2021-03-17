@@ -93,10 +93,10 @@ export const getGenericDocumentList = (params) => {
 // @Param data body request.PageInfo true "分页获取选择文书列表"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /doc/getGenericDocPickList [get]
-export const getGenericDocPickList = (params) => {
+export const getGenericDocPickList = (data) => {
     return service({
         url: "/doc/getGenericDocPickList",
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 }

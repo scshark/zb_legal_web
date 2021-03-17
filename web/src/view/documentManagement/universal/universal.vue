@@ -97,11 +97,25 @@
         <el-form :inline="true" :model="dialogInfo" class="demo-form-inline">     
           <el-form-item label="关键词">
             <el-input placeholder="关键词" v-model="dialogInfo.keyword"></el-input>
-          </el-form-item>                 
+          </el-form-item>
+
           <el-form-item>
             <el-button @click="dialogOnSubmit" type="primary">查询</el-button>
           </el-form-item>
         </el-form>
+
+        <div class="typeRow">
+          <span>文书类型</span>
+          <el-cascader
+            :options="calssOptions"
+            :props="props"
+            :key="isClassShow"
+            v-model="classId"
+            @change="classChange"
+            filterable
+            clearable>
+          </el-cascader>
+        </div>
       </div>
 
       <el-table
@@ -147,6 +161,9 @@ import {
     getGenericDocumentList,
     getGenericDocPickList
 } from "@/api/universal";  //  此处请自行替换地址
+import {
+    getAllClass,
+} from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
 import infoList from "@/components/mixins/infoList";
 import { mapGetters } from "vuex";
@@ -170,6 +187,9 @@ export default {
         status: '',
         hotSearchSort: ''
       },
+      props: { multiple: true },
+      calssOptions: [],
+      isClassShow: 0,
       dialogData: [],
       dialogPage: 1,
       dialogTotal: 10,
@@ -185,7 +205,9 @@ export default {
             label: '隐藏'
         }
       ],
-      dialogInfo: {}
+      dialogInfo: {},
+      classId: [],
+      selectClass: []
     }
   },
   filters: {
@@ -292,6 +314,7 @@ export default {
       this.dialogFormVisible = false;
       this.dialogInfo = {}
       this.dialogPage = 1
+      this.classId = []
       // this.initForm()
     },
     async deleteHotSearch(row) {
@@ -323,18 +346,51 @@ export default {
     },
     async openDialog() {
       await this.getDialogData()
+      const classData = await getAllClass();
+      if(classData.code == 0) {
+        this.calssOptions = classData.data
+      }
 
       this.type = "create";
       this.dialogFormVisible = true;
     },
-    async getDialogData(page = this.dialogPage, pageSize = this.dialogPageSize) {
-      const documentList = await getGenericDocPickList({ page, pageSize, ...this.dialogInfo })
+    async getDialogData(page = this.dialogPage, pageSize = this.dialogPageSize, class_id = this.selectClass ) {
+      if(this.classId) {
+        this.selectClass = []
+        for(var b=0;b<this.classId.length;b++) {
+          for(var c=0;c<this.classId[b].length;c++) {
+            if(c == this.classId[b].length-1) {
+              this.selectClass.push(this.classId[b][c])
+            }
+          }
+        }
+      }
+      
+      const documentList = await getGenericDocPickList({ page, pageSize, class_id, ...this.dialogInfo })
       this.dialogData = documentList.data.list
       this.dialogTotal = documentList.data.total
       this.dialogPage = documentList.data.page
       this.dialogPageSize = documentList.data.pageSize
+    },
+    async classChange(e) {
+      if(e) {
+        this.selectClass = []
+        for(var b=0;b<e.length;b++) {
+          for(var c=0;c<e[b].length;c++) {
+            if(c == e[b].length-1) {
+              this.selectClass.push(e[b][c])
+            }
+          }
+        }
+      }
 
-      console.log(this.dialogPage)
+      this.dialogPage = 1
+      this.dialogPageSize = 10 
+      const documentList = await getGenericDocPickList({ page: this.dialogPage, pageSize:this.dialogPageSize, class_id: this.selectClass, ...this.dialogInfo })
+      this.dialogData = documentList.data.list
+      this.dialogTotal = documentList.data.total
+      this.dialogPage = documentList.data.page
+      this.dialogPageSize = documentList.data.pageSize
     },
     dialogSizeChange(val) {
       this.dialogPageSize = val
