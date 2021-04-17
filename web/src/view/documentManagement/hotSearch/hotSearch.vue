@@ -2,8 +2,8 @@
   <div>
     <div class="search-term">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">     
-        <el-form-item label="关键词">
-          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        <el-form-item label="搜索">
+          <el-input placeholder="搜索" v-model="searchInfo.keyword"></el-input>
         </el-form-item>                 
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
@@ -75,7 +75,31 @@
     ></el-pagination>
 
     <el-dialog :before-close="closeDialog" :title="dialogTitle" :visible.sync="dialogFormVisible">
-      
+      <div class="search-term">
+        <el-form :inline="true" :model="dialogInfo" class="demo-form-inline">     
+          <el-form-item label="搜索">
+            <el-input placeholder="搜索" v-model="dialogInfo.keyword"></el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button @click="dialogOnSubmit" type="primary">查询</el-button>
+          </el-form-item>
+        </el-form>
+
+        <div class="typeRow">
+          <span>文书类型</span>
+          <el-cascader
+            :options="calssOptions"
+            :props="props"
+            :key="isClassShow"
+            v-model="classId"
+            @change="classChange"
+            filterable
+            clearable>
+          </el-cascader>
+        </div>
+      </div>
+
       <el-table
       :data="dialogData"
       @selection-change="dialogDataChange"
@@ -85,7 +109,7 @@
       style="width: 100%"
       tooltip-effect="dark"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column type="selection" :selectable='checkboxT' width="55"></el-table-column>
         
         <el-table-column label="标题" prop="title"></el-table-column> 
         
@@ -116,10 +140,11 @@ import {
     updateHotSearchSort,
     deleteHotSearchByIds,
     deleteHotSearch,
-    createHotSearch
+    createHotSearch,
+    getHotSearchDocPickList
 } from "@/api/hotSearch";  //  此处请自行替换地址
 import {
-    getDocumentList
+    getAllClass,
 } from "@/api/documentList";  //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/data";
 import infoList from "@/components/mixins/infoList";
@@ -144,11 +169,17 @@ export default {
         status: '',
         hotSearchSort: ''
       },
+      props: { multiple: true },
+      calssOptions: [],
+      isClassShow: 0,
       dialogData: [],
       dialogPage: 1,
       dialogTotal: 10,
       dialogPageSize: 10,
       showEdit: [], //显示编辑框
+      dialogInfo: {},
+      classId: [],
+      selectClass: []
     }
   },
   filters: {
@@ -175,6 +206,13 @@ export default {
     }
   },
   methods: {
+    checkboxT(row,index){
+      if(row.isPick){
+        return 0
+      }else {
+        return 1
+      }
+    },
     editBtn(index, row) {
       this.$set(this.showEdit,index,true)
     },
@@ -275,17 +313,52 @@ export default {
     },
     async openDialog() {
       await this.getDialogData()
-
+      const classData = await getAllClass();
+      if(classData.code == 0) {
+        this.calssOptions = classData.data
+      }
+      
       this.type = "create";
       this.dialogFormVisible = true;
     },
-    async getDialogData(page = this.dialogPage, pageSize = this.dialogPageSize) {
-      const documentList = await getDocumentList({ page, pageSize })
+    async getDialogData(page = this.dialogPage, pageSize = this.dialogPageSize, class_id = this.selectClass) {
+      if(this.classId) {
+        this.selectClass = []
+        for(var b=0;b<this.classId.length;b++) {
+          for(var c=0;c<this.classId[b].length;c++) {
+            if(c == this.classId[b].length-1) {
+              this.selectClass.push(this.classId[b][c])
+            }
+          }
+        }
+      }
+
+      const documentList = await getHotSearchDocPickList({ page, pageSize, class_id, ...this.dialogInfo })
       this.dialogData = documentList.data.list
       this.dialogTotal = documentList.data.total
       this.dialogPage = documentList.data.page
       this.dialogPageSize = documentList.data.pageSize
     },
+    async classChange(e) {
+      if(e) {
+        this.selectClass = []
+        for(var b=0;b<e.length;b++) {
+          for(var c=0;c<e[b].length;c++) {
+            if(c == e[b].length-1) {
+              this.selectClass.push(e[b][c])
+            }
+          }
+        }
+      }
+
+      this.dialogPage = 1
+      this.dialogPageSize = 10 
+      const documentList = await getGenericDocPickList({ page: this.dialogPage, pageSize:this.dialogPageSize, class_id: this.selectClass, ...this.dialogInfo })
+      this.dialogData = documentList.data.list
+      this.dialogTotal = documentList.data.total
+      this.dialogPage = documentList.data.page
+      this.dialogPageSize = documentList.data.pageSize
+    },  
     dialogSizeChange(val) {
       this.dialogPageSize = val
       this.openDialog()
@@ -294,6 +367,11 @@ export default {
         this.dialogPage = val
         this.openDialog()
     },
+    dialogOnSubmit() {
+      this.dialogPage = 1
+      this.dialogPageSize = 10                
+      this.getDialogData()
+    }
   },
   async created() {
     await this.getTableData();
@@ -356,5 +434,29 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 27px;
+}
+
+.search-term {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-term .demo-form-inline {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.search-term .el-form-item {
+  margin-bottom: 0 !important;
+}
+
+.typeRow {  
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.typeRow span {
+  margin-right: 10px;
 }
 </style>

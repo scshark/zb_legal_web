@@ -83,3 +83,19 @@ export const getHotSearchList = (params) => {
         params
     })
 }
+
+// @Tags Document
+// @Summary 分页获取选择热搜文书列表
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "分页获取选择热搜文书列表"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /doc/getHotSearchDocPickList [get]
+export const getHotSearchDocPickList = (data) => {
+    return service({
+        url: "/doc/getHotSearchDocPickList",
+        method: 'post',
+        data
+    })
+}

@@ -2,8 +2,8 @@
   <div>
     <div class="search-term">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">     
-        <el-form-item label="关键词">
-          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        <el-form-item label="搜索">
+          <el-input placeholder="搜索" v-model="searchInfo.keyword"></el-input>
         </el-form-item>                 
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
@@ -95,8 +95,8 @@
     <el-dialog :before-close="closeDialog" :title="dialogTitle" :visible.sync="dialogFormVisible">
       <div class="search-term">
         <el-form :inline="true" :model="dialogInfo" class="demo-form-inline">     
-          <el-form-item label="关键词">
-            <el-input placeholder="关键词" v-model="dialogInfo.keyword"></el-input>
+          <el-form-item label="搜索">
+            <el-input placeholder="搜索" v-model="dialogInfo.keyword"></el-input>
           </el-form-item>
 
           <el-form-item>
@@ -467,5 +467,29 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 27px;
+}
+
+.search-term {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-term .demo-form-inline {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.search-term .el-form-item {
+  margin-bottom: 0 !important;
+}
+
+.typeRow {  
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.typeRow span {
+  margin-right: 10px;
 }
 </style>

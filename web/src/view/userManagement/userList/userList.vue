@@ -2,8 +2,8 @@
   <div>
     <div class="search-term">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">    
-        <el-form-item label="关键词">
-          <el-input placeholder="关键词" v-model="searchInfo.keyword"></el-input>
+        <el-form-item label="搜索">
+          <el-input placeholder="搜索" v-model="searchInfo.keyword"></el-input>
         </el-form-item>                   
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
