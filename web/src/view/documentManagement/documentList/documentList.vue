@@ -137,7 +137,7 @@
         <el-form-item label="文书类型" prop="classId" style="width:90%">
           <el-cascader
             :options="calssOptions"
-            :props="props"
+            :props="{ checkStrictly: true }"
             :key="isClassShow"
             v-model="formData.classId"
             filterable
