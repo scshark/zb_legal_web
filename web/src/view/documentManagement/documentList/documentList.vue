@@ -137,7 +137,7 @@
         <el-form-item label="文书类型" prop="classId" style="width:90%">
           <el-cascader
             :options="calssOptions"
-            :props="{ checkStrictly: true }"
+            :props="props"
             :key="isClassShow"
             v-model="formData.classId"
             filterable
@@ -229,7 +229,7 @@ export default {
       multipleSelection: [],
       dialogTitle: '新增文书',
       fileList: [],
-      props: { multiple: true },
+      props: { multiple: true, checkStrictly: true },
       isResouceShow: 0,
       options: [],
       calssOptions: [],
