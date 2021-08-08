@@ -67,6 +67,22 @@ export const updateHotSearchSort = (data) => {
     })
 }
 
+// @Tags Document
+// @Summary 更新热搜文书信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body model.Document true "更新热搜文书信息"
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"更新成功"}"
+// @Router /doc/updateHotSearch [put]
+export const updateHotSearch = (data) => {
+    return service({
+        url: "/doc/updateHotSearch",
+        method: 'put',
+        data
+    })
+}
+
 
 // @Tags Document
 // @Summary 分页获取热搜文书列表

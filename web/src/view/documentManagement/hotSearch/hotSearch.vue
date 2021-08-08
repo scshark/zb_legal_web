@@ -45,12 +45,33 @@
           </template>
       </el-table-column> 
       
+      <el-table-column label="图片" prop="logoImageUrl" width="150">
+        <template slot-scope="{row,$index}">
+          <div :style="{'textAlign':'center'}">
+            <el-upload
+              class="upload-demo"
+              :action="`http://service.gdzblf.com/fileUploadAndDownload/upload`"
+              :on-success="imgFileSuccess"
+              :headers="{ 'x-token': token }"
+              :multiple="false"
+              :show-file-list="false"
+               v-if="showEdit[$index]"
+              >
+              <img v-if="row.logoImageUrl" :src="row.logoImageUrl" height="80" width="80" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+            <img :src="row.logoImageUrl" height="80" width="80"  v-if="!showEdit[$index]" />
+          </div>
+        </template>  
+      </el-table-column> 
+
       <el-table-column label="发布日期" prop="releasedTime" width="250"></el-table-column> 
       
       <el-table-column label="按钮组">
         <template slot-scope="scope">
           <el-button @click="editBtn(scope.$index, scope.row)" size="small" type="primary" v-if="!showEdit[scope.$index]" >编辑</el-button>
           <el-button @click="updateSort(scope.$index, scope.row)" size="small" type="primary" v-if="showEdit[scope.$index]">确定</el-button>
+          <el-button @click="cancelUpdate(scope.$index, scope.row)" size="small" type="warning" v-if="showEdit[scope.$index]">取消</el-button>
           <el-popover placement="top" width="160" v-model="scope.row.visible">
             <p>确定要删除吗？</p>
             <div style="text-align: right; margin: 0">
@@ -138,6 +159,7 @@
 import {
     getHotSearchList,
     updateHotSearchSort,
+    updateHotSearch,
     deleteHotSearchByIds,
     deleteHotSearch,
     createHotSearch,
@@ -159,6 +181,7 @@ export default {
       dialogFormVisible: false,
       visible: false,
       deleteVisible: false,
+      updateIndex: '',
       multipleSelection: [],
       dialogDataSelection: [],
       dialogTitle: '新增热搜文书',
@@ -213,7 +236,12 @@ export default {
         return 1
       }
     },
+    imgFileSuccess(res, file) {
+      console.log(res)
+      this.tableData[this.updateIndex].logoImageUrl = res.data.file.url
+    },
     editBtn(index, row) {
+      this.updateIndex = index
       this.$set(this.showEdit,index,true)
     },
     sortEdit(index, row) {
@@ -222,23 +250,34 @@ export default {
     async updateSort(index, row) {
       let updateData = {
         id: row.id,
+        logo_image_url: row.logoImageUrl,
         sort: Number(row.hotSearchSort)
       }
-      const res = await updateHotSearchSort(updateData)
+      const res = await updateHotSearch(updateData)
       if (res.code == 0) {
         this.$message({
           type:"success",
           message:"更改成功"
         })
+        this.updateIndex = ''
         this.$set(this.showEdit,index,false)
+        this.getTableData();
       } else {
         this.$message({
           type:"error",
           message:"修改失败"
         })
+        this.updateIndex = ''
+        this.$set(this.showEdit,index,false)
+        this.getTableData();
       }
 
       
+    },
+
+    cancelUpdate(index, row) {
+      this.updateIndex = ''
+      this.$set(this.showEdit,index,false)
     },
     dialogDataChange(val) {
       this.dialogDataSelection = val
